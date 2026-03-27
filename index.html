@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psyche — Il Gioco dell'Anima</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #130e08;
+  --bg2: #1e160d;
+  --parchment: #f5edda;
+  --parchment-mid: #d4b97a;
+  --parchment-dim: #9a7e50;
+  --ink: #1e1208;
+  --card-bg: #faf3e0;
+  --card-border: #b08c48;
+  --red: #c93030;
+  --red-dim: #8b1a1a;
+  --red-bg: rgba(139,26,26,0.18);
+  --teal: #2a9e99;
+  --teal-dim: #1a5c5a;
+  --teal-bg: rgba(26,92,90,0.18);
+  --gold: #c9a020;
+  --gold-dim: #8b6914;
+  --gold-bg: rgba(139,105,20,0.18);
+  --border: rgba(176,140,72,0.35);
+  --border-faint: rgba(176,140,72,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'Lora', Georgia, serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,2,0,0.85);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#popup-overlay.active { display: flex; }
+#popup-box {
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 28px 28px 22px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+#popup-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+#popup-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+#popup-desc {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--parchment-mid);
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+#popup-effect {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  line-height: 1.6;
+  border-top: 1px solid var(--border-faint);
+  padding-top: 10px;
+  margin-bottom: 18px;
+}
+#popup-close {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--parchment-mid);
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 9px 28px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+#popup-close:hover { background: rgba(176,140,72,0.1); }
+#game-container {
+  position: relative;
+  z-index: 1;
+  width: 440px;
+  max-width: 98vw;
+  padding: 0 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#header { text-align: center; margin-bottom: 12px; }
+#header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--parchment);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+#header .subtitle {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+#status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+#phase-dots { display: flex; gap: 5px; align-items: center; }
+.phase-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: rgba(244,234,213,0.15);
+  border: 1px solid rgba(244,234,213,0.3);
+  transition: all 0.4s;
+}
+.phase-dot.active { background: var(--parchment-mid); box-shadow: 0 0 7px rgba(200,160,80,0.6); }
+.phase-dot.done { background: rgba(244,234,213,0.45); }
+#phase-label {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--parchment-mid);
+  letter-spacing: 1px;
+  margin-left: 10px;
+}
+#age-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  letter-spacing: 2px;
+}
+#psyche-panel {
+  width: 100%;
+  background: rgba(15,9,3,0.7);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+.psyche-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.psyche-row:last-child { margin-bottom: 0; }
+.psyche-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 700;
+  width: 80px;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+.psyche-label.id { color: var(--red); }
+.psyche-label.ego { color: var(--teal); }
+.psyche-label.superego { color: var(--gold); }
+.bar-track {
+  flex: 1;
+  height: 9px;
+  background: rgba(244,234,213,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-fill.id { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
+.bar-fill.ego { background: linear-gradient(90deg, var(--teal-dim), var(--teal)); }
+.bar-fill.superego { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+.bar-fill.danger-low { animation: blink 1s ease-in-out infinite; }
+.bar-fill.danger-high { animation: blink 0.5s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.bar-val {
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  width: 26px;
+  text-align: right;
+  color: var(--parchment-dim);
+}
+.strip {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0 1px;
+}
+#pathologies-strip { margin-bottom: 5px; }
+#defenses-strip { margin-bottom: 8px; }
+.patho-tag, .defense-tag {
+  border-radius: 3px;
+  padding: 3px 9px;
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.patho-tag {
+  background: rgba(139,26,26,0.25);
+  border: 1px solid rgba(201,48,48,0.4);
+  color: #e07070;
+}
+.defense-tag {
+  background: rgba(26,92,90,0.25);
+  border: 1px solid rgba(42,158,153,0.4);
+  color: #60c0bb;
+}
+.patho-tag:hover, .defense-tag:hover { opacity: 0.75; }
+#card-container {
+  width: 100%;
+  position: relative;
+  height: 215px;
+  margin-bottom: 10px;
+}
+#card {
+  width: 100%;
+  height: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 18px 22px 14px;
+  position: relative;
+  overflow: hidden;
+  transform-origin: center bottom;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+}
+#card:active { cursor: grabbing; }
+#card::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(160,120,64,0.18);
+  border-radius: 4px;
+  pointer-events: none;
+}
+@keyframes card-in {
+  from { transform: scale(0.88) translateY(24px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);    opacity: 1; }
+}
+#card.appear { animation: card-in 0.38s ease-out forwards; }
+.card-speaker {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--parchment-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 9px;
+}
+.card-ornament {
+  text-align: center;
+  color: var(--card-border);
+  font-size: 13px;
+  margin-bottom: 9px;
+  opacity: 0.5;
+}
+#card-text {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.6;
+  text-align: center;
+}
+#card-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: 'Lora', serif;
+  font-size: 11px;
+  color: var(--parchment-dim);
+  opacity: 0;
+  transition: opacity 0.4s;
+  letter-spacing: 1px;
+}
+#card-hint.visible { opacity: 1; }
+#choice-preview {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  min-height: 66px;
+}
+.choice-panel {
+  flex: 1;
+  min-width: 0;
+  background: rgba(15,9,3,0.6);
+  border: 1px solid var(--border-faint);
+  border-radius: 5px;
+  padding: 8px 10px;
+  opacity: 0;
+  transition: opacity 0.25s, background 0.25s;
+}
+.choice-panel.show-left  { opacity:1; background: var(--red-bg);  border-left:  2px solid var(--red); }
+.choice-panel.show-right { opacity:1; background: var(--teal-bg); border-right: 2px solid var(--teal); }
+.choice-label {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--parchment-mid);
+  line-height: 1.4;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+.choice-effects { display: flex; gap: 4px; flex-wrap: wrap; }
+.effect-pill {
+  font-family: 'Lora', serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.up-id    { background: rgba(201,48,48,0.2);  color: #e08080; }
+.down-id  { background: rgba(201,48,48,0.1);  color: #a05050; }
+.up-ego   { background: rgba(42,158,153,0.2); color: #70c4c0; }
+.down-ego { background: rgba(42,158,153,0.1); color: #408080; }
+.up-sup   { background: rgba(201,160,32,0.2); color: #e0c040; }
+.down-sup { background: rgba(201,160,32,0.1); color: #a08020; }
+.def-pill { background: rgba(42,158,153,0.15); color: #60c0bb; }
+#btn-row { display: flex; gap: 10px; width: 100%; margin-bottom: 8px; }
+.choice-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 8px;
+  border: 1px solid;
+  border-radius: 5px;
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#btn-left  { background: var(--red-bg);  border-color: var(--red-dim);  color: var(--red); }
+#btn-right { background: var(--teal-bg); border-color: var(--teal-dim); color: var(--teal); }
+#btn-left:hover  { background: rgba(139,26,26,0.28); }
+#btn-right:hover { background: rgba(26,92,90,0.28); }
+#event-log {
+  width: 100%;
+  background: rgba(8,4,1,0.6);
+  border: 1px solid var(--border-faint);
+  border-radius: 5px;
+  padding: 8px 12px;
+  max-height: 62px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160,120,64,0.3) transparent;
+}
+.log-entry {
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  color: var(--parchment-dim);
+  line-height: 1.5;
+}
+.log-entry.fresh { color: var(--parchment-mid); }
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,2,0,0.93);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 28px;
+  text-align: center;
+}
+#overlay.active { display: flex; }
+.overlay-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--parchment);
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+.overlay-sub {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--parchment-mid);
+  max-width: 340px;
+  line-height: 1.75;
+  margin-bottom: 18px;
+}
+.overlay-stats {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  margin-bottom: 26px;
+  line-height: 1.9;
+}
+#overlay-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--parchment-mid);
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 11px 32px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+#overlay-btn:hover { background: rgba(176,140,72,0.1); }
+#notification {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-90px);
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+  z-index: 400;
+  transition: transform 0.4s cubic-bezier(0.34,1.4,0.64,1);
+  max-width: 340px;
+  text-align: center;
+}
+#notification.show { transform: translateX(-50%) translateY(0); }
+#intro {
+  position: fixed;
+  inset: 0;
+  background: #0b0804;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 32px;
+  gap: 16px;
+  text-align: center;
+}
+#intro h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--parchment);
+  letter-spacing: 7px;
+  text-transform: uppercase;
+}
+.intro-rule {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+}
+.intro-sub {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  color: var(--parchment-mid);
+  max-width: 340px;
+  line-height: 1.8;
+}
+.intro-legend {
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  color: var(--parchment-dim);
+  max-width: 360px;
+  line-height: 2;
+}
+.l-id  { color: var(--red);  font-weight: 600; }
+.l-ego { color: var(--teal); font-weight: 600; }
+.l-sup { color: var(--gold); font-weight: 600; }
+#start-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--parchment-mid);
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 13px 40px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+  margin-top: 6px;
+}
+#start-btn:hover { background: rgba(176,140,72,0.1); letter-spacing: 6px; }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <h1>PSYCHE</h1>
+  <div class="intro-rule"></div>
+  <div class="intro-sub">Una vita intera si dipana attraverso le tue scelte. Mantieni l'equilibrio tra le forze dell'anima.</div>
+  <div class="intro-legend">
+    <span class="l-id">ES</span> — il piacere, l'istinto, il desiderio<br>
+    <span class="l-ego">IO</span> — la mediazione, il senso di realta<br>
+    <span class="l-sup">SUPER-IO</span> — la morale, il giudizio, l'ideale<br><br>
+    Lo squilibrio genera psicopatologie.<br>Le scelte costruiscono meccanismi di difesa.
+  </div>
+  <button id="start-btn" onclick="startGame()">Inizia la vita</button>
+</div>
+
+<div id="popup-overlay">
+  <div id="popup-box">
+    <span id="popup-icon"></span>
+    <div id="popup-title"></div>
+    <div id="popup-desc"></div>
+    <div id="popup-effect"></div>
+    <button id="popup-close" onclick="closePopup()">Continua</button>
+  </div>
+</div>
+
+<div id="game-container">
+  <div id="header">
+    <h1>Psyche</h1>
+    <div class="subtitle">Il Gioco dell'Anima</div>
+  </div>
+
+  <div id="status-row">
+    <div style="display:flex;align-items:center;">
+      <div id="phase-dots">
+        <div class="phase-dot" id="dot-0"></div>
+        <div class="phase-dot" id="dot-1"></div>
+        <div class="phase-dot" id="dot-2"></div>
+        <div class="phase-dot" id="dot-3"></div>
+        <div class="phase-dot" id="dot-4"></div>
+      </div>
+      <div id="phase-label">Infanzia</div>
+    </div>
+    <div id="age-display">Eta: <span id="age-num">6</span> anni</div>
+  </div>
+
+  <div id="psyche-panel">
+    <div class="psyche-row">
+      <div class="psyche-label id">ES</div>
+      <div class="bar-track"><div class="bar-fill id" id="bar-id" style="width:33%"></div></div>
+      <div class="bar-val" id="val-id">33</div>
+    </div>
+    <div class="psyche-row">
+      <div class="psyche-label ego">IO</div>
+      <div class="bar-track"><div class="bar-fill ego" id="bar-ego" style="width:34%"></div></div>
+      <div class="bar-val" id="val-ego">34</div>
+    </div>
+    <div class="psyche-row">
+      <div class="psyche-label superego">SUPER-IO</div>
+      <div class="bar-track"><div class="bar-fill superego" id="bar-superego" style="width:33%"></div></div>
+      <div class="bar-val" id="val-superego">33</div>
+    </div>
+  </div>
+
+  <div class="strip" id="pathologies-strip"></div>
+  <div class="strip" id="defenses-strip"></div>
+
+  <div id="card-container">
+    <div id="card">
+      <div class="card-speaker" id="card-speaker"></div>
+      <div class="card-ornament">&#10022;</div>
+      <div id="card-text">...</div>
+      <div id="card-hint">trascina la carta per scegliere</div>
+    </div>
+  </div>
+
+  <div id="choice-preview">
+    <div class="choice-panel left-panel" id="preview-left">
+      <div class="choice-label" id="preview-left-text"></div>
+      <div class="choice-effects" id="preview-left-fx"></div>
+    </div>
+    <div class="choice-panel right-panel" id="preview-right">
+      <div class="choice-label" id="preview-right-text"></div>
+      <div class="choice-effects" id="preview-right-fx"></div>
+    </div>
+  </div>
+
+  <div id="btn-row">
+    <button class="choice-btn" id="btn-left" onclick="makeChoice('left')">No</button>
+    <button class="choice-btn" id="btn-right" onclick="makeChoice('right')">Si</button>
+  </div>
+
+  <div id="event-log"></div>
+</div>
+
+<div id="overlay">
+  <div class="overlay-title" id="overlay-title">Fine</div>
+  <div class="overlay-sub" id="overlay-sub"></div>
+  <div class="overlay-stats" id="overlay-stats"></div>
+  <button id="overlay-btn" onclick="resetGame()">Ricomincia</button>
+</div>
+
+<div id="notification"></div>
+
+<script>
+const PHASES = [
+  { name:'Infanzia',          ageStart:4,  ageEnd:11  },
+  { name:'Adolescenza',       ageStart:12, ageEnd:17  },
+  { name:'Prima eta adulta',  ageStart:18, ageEnd:35  },
+  { name:'Eta adulta',        ageStart:36, ageEnd:65  },
+  { name:'Vecchiaia',         ageStart:66, ageEnd:100 },
+];
+
+const DEFENSES = {
+  rimozione: {
+    name:'Rimozione', icon:'🫧',
+    desc:'Allontani dalla coscienza ricordi o impulsi dolorosi, come se non fossero mai esistiti.',
+    effectDesc:'Effetto nel gioco: riduce del 15% i danni futuri da scelte impulsive sull ES.',
+    effect: (st) => { st.idModifier -= 0.15; }
+  },
+  proiezione: {
+    name:'Proiezione', icon:'🪞',
+    desc:'Attribuisci agli altri i tuoi impulsi inaccettabili, vedendo in loro cio che non vuoi vedere in te.',
+    effectDesc:'Effetto nel gioco: blocca automaticamente la prima psicopatologia che si manifesta.',
+    effect: (st) => { st.projezione = true; }
+  },
+  razionalizzazione: {
+    name:'Razionalizzazione', icon:'🧠',
+    desc:'Giustifichi con argomenti razionali scelte che nascono da impulsi o emozioni.',
+    effectDesc:'Effetto nel gioco: IO +5 permanente.',
+    effect: (st) => { st.ego = Math.min(100, st.ego + 5); }
+  },
+  sublimazione: {
+    name:'Sublimazione', icon:'🎨',
+    desc:'Trasformi energie pulsionali in attivita creative, produttive e socialmente accettate.',
+    effectDesc:'Effetto nel gioco: ogni scelta creativa ti dona +3 IO aggiuntivi.',
+    effect: (st) => { st.sublimazione = true; }
+  },
+  negazione: {
+    name:'Negazione', icon:'🚫',
+    desc:'Rifiuti di riconoscere la realta di eventi o situazioni troppo dolorosi da accettare.',
+    effectDesc:'Effetto nel gioco: se l IO crolla a zero, ti salva una volta riportandolo a 12.',
+    effect: (st) => { st.negazione = true; }
+  },
+  regressione: {
+    name:'Regressione', icon:'👶',
+    desc:'Torni a comportamenti tipici di fasi evolutive precedenti quando sei sotto stress.',
+    effectDesc:'Effetto nel gioco: ES +6 permanente, ma le scelte impulsive costano -2 IO aggiuntivi.',
+    effect: (st) => { st.id = Math.min(100, st.id + 6); st.regressionePenalty = true; }
+  },
+  formazione_reattiva: {
+    name:'Formazione reattiva', icon:'🎭',
+    desc:'Esprimi sentimenti esattamente opposti a quelli reali per mascherare impulsi inaccettabili.',
+    effectDesc:'Effetto nel gioco: SUPER-IO +5 permanente.',
+    effect: (st) => { st.superego = Math.min(100, st.superego + 5); }
+  },
+  intellettualizzazione: {
+    name:'Intellettualizzazione', icon:'📚',
+    desc:'Usi il pensiero astratto e la logica per distanziarti dal peso emotivo delle esperienze.',
+    effectDesc:'Effetto nel gioco: IO +3 e ES -3 permanente.',
+    effect: (st) => { st.ego = Math.min(100, st.ego + 3); st.id = Math.max(0, st.id - 3); }
+  },
+  spostamento: {
+    name:'Spostamento', icon:'↔',
+    desc:'Redirigi le emozioni intense, specie la rabbia, verso oggetti o persone piu sicuri.',
+    effectDesc:'Effetto nel gioco: riduce del 30% il danno da scelte aggressive.',
+    effect: (st) => { st.spostamento = true; }
+  },
+  identificazione: {
+    name:'Identificazione', icon:'🪆',
+    desc:'Ti conformi a una figura di autorita o modello, assorbendone valori e comportamenti.',
+    effectDesc:'Effetto nel gioco: SUPER-IO +6 permanente.',
+    effect: (st) => { st.superego = Math.min(100, st.superego + 6); }
+  },
+  umorismo: {
+    name:'Umorismo', icon:'😄',
+    desc:'Usi la leggerezza e l ironia per elaborare situazioni dolorose senza negarle davvero.',
+    effectDesc:'Effetto nel gioco: protegge da un game over per accumulo di psicopatologie.',
+    effect: (st) => { st.umorismo = true; }
+  },
+  altruismo: {
+    name:'Altruismo', icon:'🤝',
+    desc:'Ti dedichi al benessere degli altri come modo per sublimare i tuoi bisogni non soddisfatti.',
+    effectDesc:'Effetto nel gioco: IO +3 e SUPER-IO +3 permanente.',
+    effect: (st) => { st.ego = Math.min(100, st.ego + 3); st.superego = Math.min(100, st.superego + 3); }
+  },
+};
+
+const PATHOLOGIES = {
+  isteria: {
+    name:'Isteria', icon:'🌊',
+    desc:'L ES domina incontrastato. Il corpo esprime cio che la mente non riesce ad elaborare.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -1. Le scelte impulsive causano +3 ES extra.',
+    condition: (st) => st.id > 70 && st.superego < 30,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 1); }
+  },
+  nevrosi_ossessiva: {
+    name:'Nevrosi ossessiva', icon:'🔁',
+    desc:'Il SUPER-IO soffoca ogni impulso. Rituali e pensieri ripetitivi colonizzano la mente.',
+    effectDesc:'Effetto nel gioco: ogni turno ES -1. Le scelte moralmente rigorose aumentano SUPER-IO di +3 extra.',
+    condition: (st) => st.superego > 75 && st.id < 25,
+    ongoingEffect: (st) => { st.id = Math.max(0, st.id - 1); }
+  },
+  narcisismo: {
+    name:'Narcisismo', icon:'💫',
+    desc:'L ES si espande senza argini. L IO non regge piu il senso di grandiosita del se.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -1. Le scelte altruistiche non aumentano piu il SUPER-IO.',
+    condition: (st) => st.id > 65 && st.ego < 30,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 1); st.narcisismoActive = true; }
+  },
+  depressione: {
+    name:'Depressione', icon:'🌑',
+    desc:'Il SUPER-IO si rivolta contro l IO. Il senso di colpa diventa sistematicamente autodistruttivo.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -2 e SUPER-IO +1.',
+    condition: (st) => st.superego > 70 && st.ego < 25,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); st.superego = Math.min(100, st.superego + 1); }
+  },
+  borderline: {
+    name:'Disturbo borderline', icon:'⚡',
+    desc:'Violenta instabilita tra impulso e vuoto identitario. I confini del se si dissolvono.',
+    effectDesc:'Effetto nel gioco: ogni turno tutte le forze oscillano casualmente di +/-2.',
+    condition: (st) => st.id > 60 && st.superego < 25,
+    ongoingEffect: (st) => {
+      const r = () => (Math.random() > 0.5 ? 2 : -2);
+      st.id = clamp(st.id + r(), 0, 100);
+      st.ego = clamp(st.ego + r(), 0, 100);
+      st.superego = clamp(st.superego + r(), 0, 100);
+    }
+  },
+  paranoia: {
+    name:'Paranoia', icon:'👁',
+    desc:'Il conflitto interiore si proietta nel mondo esterno come minaccia persecutoria.',
+    effectDesc:'Effetto nel gioco: ogni turno SUPER-IO +2. Le scelte sociali costano -2 IO extra.',
+    condition: (st) => st.superego > 65 && st.id > 55,
+    ongoingEffect: (st) => { st.superego = Math.min(100, st.superego + 2); }
+  },
+  ansia_generalizzata: {
+    name:'Ansia generalizzata', icon:'😰',
+    desc:'L IO non regge piu la tensione tra ES e SUPER-IO. L angoscia diventa pervasiva.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -2. Le scelte di evitamento costano -2 IO extra.',
+    condition: (st) => st.ego < 20,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); }
+  },
+  fobia: {
+    name:'Fobia', icon:'😨',
+    desc:'L angoscia si concentra su un oggetto specifico. L evitamento diventa stile di vita.',
+    effectDesc:'Effetto nel gioco: ogni turno ES +1 e IO -1.',
+    condition: (st) => st.id > 55 && st.superego > 55 && st.ego < 35,
+    ongoingEffect: (st) => { st.id = Math.min(100, st.id + 1); st.ego = Math.max(0, st.ego - 1); }
+  },
+  dissociazione: {
+    name:'Dissociazione', icon:'🌫',
+    desc:'ES e SUPER-IO si sono allontanati oltre ogni limite. L IO perde la coerenza del se.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -3.',
+    condition: (st) => Math.abs(st.id - st.superego) > 60,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 3); }
+  },
+  melancolia: {
+    name:'Melancolia', icon:'🕯',
+    desc:'La perdita si e insediata nel nucleo dell IO. Il lutto non riesce mai a concludersi.',
+    effectDesc:'Effetto nel gioco: ogni turno IO -2 e SUPER-IO +2.',
+    condition: (st) => st.ego < 15 && st.superego > 60,
+    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); st.superego = Math.min(100, st.superego + 2); }
+  },
+};
+
+const CARDS = [
+  // INFANZIA (fase 0)
+  {id:'c001',phase:0,tags:['family'],speaker:'Tua madre',
+   text:'Piangi nel letto di notte. Tua madre entra nella stanza. Ti lascia dormire con lei o ti dice di tornare nel tuo letto?',
+   leftChoice: {text:'Dormi con lei',          id:+8,  ego:-4,  superego:-3,  log:"Hai cercato conforto fisico. L'ES e rinvigorito.",  defense:null},
+   rightChoice:{text:'Rimani nel tuo letto',   id:-5,  ego:+3,  superego:+7,  log:"Hai tollerato la solitudine. Il SUPER-IO cresce.",  defense:'negazione'}},
+  {id:'c002',phase:0,tags:['play'],speaker:'Il tuo compagno',
+   text:'Ti propone di rompere il vaso della vicina per divertimento. E solo un gioco, no?',
+   leftChoice: {text:'Lo rompi',               id:+10, ego:-6,  superego:-8,  log:"Hai ceduto all'impulso. L'ES esulta.",               defense:null},
+   rightChoice:{text:'Rifiuti',                id:-6,  ego:+4,  superego:+9,  log:"Hai resistito. Il SUPER-IO si consolida.",           defense:null}},
+  {id:'c003',phase:0,tags:['school'],speaker:'La maestra',
+   text:'Ti chiede di leggere ad alta voce davanti alla classe. Hai paura di sbagliare.',
+   leftChoice: {text:'Fingi di stare male',    id:+4,  ego:-7,  superego:-4,  log:"Hai evitato l'esposizione. Regressione in atto.",    defense:'regressione'},
+   rightChoice:{text:'Leggi, tremante',        id:-3,  ego:+8,  superego:+5,  log:"Hai affrontato la paura. L'IO si rafforza.",         defense:null}},
+  {id:'c004',phase:0,tags:['desire'],speaker:'La tua voce',
+   text:'Vuoi disperatamente il giocattolo del tuo amico. Potresti prenderlo mentre non guarda.',
+   leftChoice: {text:'Lo prendi',              id:+12, ego:-8,  superego:-12, log:"Hai rubato senza rimorso. L'ES domina.",              defense:null},
+   rightChoice:{text:'Chiedi il permesso',     id:-5,  ego:+5,  superego:+10, log:"Hai mediato il desiderio. L'IO regge.",              defense:'razionalizzazione'}},
+  {id:'c005',phase:0,tags:['family'],speaker:'Tuo padre',
+   text:'Tuo padre ti punisce ingiustamente davanti a tutti. La rabbia e incontenibile.',
+   leftChoice: {text:'Piangi e urli',          id:+9,  ego:-5,  superego:-4,  log:"Hai espresso tutto. L'ES si sfoga.",                 defense:null},
+   rightChoice:{text:'Inghiotti la rabbia',    id:-6,  ego:+3,  superego:+8,  log:"Hai rimosso la rabbia. Un meccanismo si forma.",     defense:'rimozione'}},
+  {id:'c006',phase:0,tags:['imagination'],speaker:'La tua fantasia',
+   text:'Inventi un amico immaginario con cui vivere avventure segrete ogni sera prima di dormire.',
+   leftChoice: {text:'Ti immergi completamente',id:+7, ego:-3,  superego:-2,  log:"La fantasia nutre l'ES. Uno spazio libero.",         defense:null},
+   rightChoice:{text:'Rinunci, e da bambini',  id:-7,  ego:+4,  superego:+6,  log:"Hai rinunciato alla fantasia per dovere.",           defense:'formazione_reattiva'}},
+  {id:'c007',phase:0,tags:['school'],speaker:'Un compagno',
+   text:'Ti offre di copiare il compito. Sei stanco di studiare e l esame e domani.',
+   leftChoice: {text:'Copi',                   id:+8,  ego:-5,  superego:-10, log:"Hai scelto la via facile. Il SUPER-IO soffre.",      defense:null},
+   rightChoice:{text:'Rifiuti',                id:-4,  ego:+3,  superego:+11, log:"Hai resistito alla tentazione.",                     defense:null}},
+  {id:'c008',phase:0,tags:['family'],speaker:'Tua sorella',
+   text:'Tua sorella ha paura del buio. Potresti darle il tuo orsetto, ma ci sei molto affezionato.',
+   leftChoice: {text:'Tienilo per te',         id:+5,  ego:-4,  superego:-8,  log:"Hai privilegiato il tuo conforto.",                 defense:null},
+   rightChoice:{text:'Glielo offri',           id:-4,  ego:+6,  superego:+9,  log:"Gesto altruistico. IO e SUPER-IO crescono.",        defense:'altruismo'}},
+
+  // ADOLESCENZA (fase 1)
+  {id:'a001',phase:1,tags:['body'],speaker:'Lo specchio',
+   text:'Guardi il tuo corpo che cambia. Senti un desiderio che non sai ancora come chiamare.',
+   leftChoice: {text:'Esplori da solo',        id:+10, ego:-4,  superego:-6,  log:"Hai esplorato la sessualita. L'ES si risveglia.",    defense:null},
+   rightChoice:{text:'Reprimi tutto',          id:-8,  ego:+3,  superego:+12, log:"Hai represso ogni impulso. Il SUPER-IO si ipertrofizza.", defense:'rimozione'}},
+  {id:'a002',phase:1,tags:['peer'],speaker:'I tuoi amici',
+   text:'Al parco ti offrono sigarette. "Provaci, sei uno di noi." Il gruppo ti guarda.',
+   leftChoice: {text:'Fumi',                   id:+11, ego:-5,  superego:-9,  log:"Hai ceduto alla pressione. L'ES gioisce.",           defense:null},
+   rightChoice:{text:'Rifiuti',                id:-6,  ego:+5,  superego:+10, log:"Hai resistito. L'identita si consolida.",            defense:'razionalizzazione'}},
+  {id:'a003',phase:1,tags:['love'],speaker:'Il tuo primo amore',
+   text:'Ti chiede di uscire. Hai una paura enorme del rifiuto. Accetti?',
+   leftChoice: {text:'Rifiuti per paura',      id:-4,  ego:-6,  superego:+3,  log:"Hai evitato il rischio. L'IO si indebolisce.",       defense:'negazione'},
+   rightChoice:{text:'Dici si con coraggio',   id:+6,  ego:+9,  superego:+3,  log:"Coraggio. L'IO ha mediato paura e desiderio.",      defense:null}},
+  {id:'a004',phase:1,tags:['anger'],speaker:'Il professore',
+   text:'Ti umilia davanti a tutti. La rabbia e incontenibile. Come rispondi?',
+   leftChoice: {text:'Esplodi di rabbia',      id:+13, ego:-9,  superego:-7,  log:"Hai risposto con aggressivita. L'ES domina.",        defense:null},
+   rightChoice:{text:'Rispondi con ironia',    id:-3,  ego:+7,  superego:+2,  log:"Hai usato l'umorismo come scudo. Difesa matura.",    defense:'umorismo'}},
+  {id:'a005',phase:1,tags:['art'],speaker:'La tua mano',
+   text:'Scopri di saper disegnare molto bene. Potresti passare ore a farlo invece di studiare.',
+   leftChoice: {text:'Disegni ogni sera',      id:+6,  ego:+4,  superego:-5,  log:"L'arte canalizza gli impulsi. Sublimazione in atto.",defense:'sublimazione'},
+   rightChoice:{text:'Il dovere prima',        id:-5,  ego:+3,  superego:+9,  log:"Hai rinunciato al piacere per il dovere.",           defense:null}},
+  {id:'a006',phase:1,tags:['peer'],speaker:'I social network',
+   text:'Bulli online ti prendono di mira. Rispondi con insulti o blocchi e segnali?',
+   leftChoice: {text:'Rispondi con insulti',   id:+10, ego:-8,  superego:-10, log:"Hai contrattaccato. Il danno si moltiplica.",         defense:null},
+   rightChoice:{text:'Blocchi e segnali',      id:-4,  ego:+8,  superego:+7,  log:"Scelta matura. L'IO gestisce il conflitto.",         defense:'intellettualizzazione'}},
+  {id:'a007',phase:1,tags:['family'],speaker:'La tua coscienza',
+   text:'Scopri che i tuoi genitori ti mentono su qualcosa di importante. Li confronti?',
+   leftChoice: {text:'Li confronti',           id:-4,  ego:+11, superego:+5,  log:"Hai scelto la verita. L'IO matura.",                 defense:null},
+   rightChoice:{text:'Fai finta di niente',    id:+5,  ego:-7,  superego:-3,  log:"Hai scelto la negazione. Piu comoda ma costosa.",    defense:'negazione'}},
+  {id:'a008',phase:1,tags:['risk'],speaker:'Un amico',
+   text:'Ti propone di rubare qualcosa da un negozio solo per il brivido.',
+   leftChoice: {text:'Partecipi',              id:+12, ego:-6,  superego:-14, log:"Hai rubato. Il SUPER-IO crolla.",                    defense:null},
+   rightChoice:{text:'Rifiuti con fermezza',   id:-7,  ego:+5,  superego:+12, log:"Integrita mantenuta.",                              defense:null}},
+  {id:'a009',phase:1,tags:['body'],speaker:'La bilancia',
+   text:'Sei insoddisfatto del tuo corpo. Pensi di smettere di mangiare per qualche giorno.',
+   leftChoice: {text:'Smetti di mangiare',     id:-6,  ego:-9,  superego:+8,  log:"Autodistruzione per l'ideale. Il SUPER-IO punisce.", defense:null},
+   rightChoice:{text:'Parli con qualcuno',     id:+2,  ego:+10, superego:+3,  log:"Hai cercato aiuto. L'IO si rafforza.",               defense:'altruismo'}},
+
+  // PRIMA ETA ADULTA (fase 2)
+  {id:'p001',phase:2,tags:['sex'],speaker:'La sera',
+   text:'Incontri qualcuno di attraente a una festa. Non vi conoscete. Ti invita a casa sua.',
+   leftChoice: {text:'Vai senza esitare',      id:+14, ego:-5,  superego:-12, log:"Hai seguito l'istinto puro. L'ES trionfa.",          defense:null},
+   rightChoice:{text:'Declini educatamente',   id:-7,  ego:+4,  superego:+11, log:"Hai posto un limite. Il SUPER-IO e riconoscente.",   defense:null}},
+  {id:'p002',phase:2,tags:['work'],speaker:'Il tuo capo',
+   text:'Ti offre una promozione se accetti di fare una cosa eticamente discutibile.',
+   leftChoice: {text:'Accetti',                id:+7,  ego:-7,  superego:-13, log:"Hai venduto un principio. Il SUPER-IO si incrina.",  defense:'razionalizzazione'},
+   rightChoice:{text:'Rifiuti',                id:-6,  ego:+8,  superego:+13, log:"Hai scelto l'integrita.",                           defense:null}},
+  {id:'p003',phase:2,tags:['love'],speaker:'Il tuo partner',
+   text:'Ti chiede un impegno serio. Senti il desiderio di liberta confliggere con l amore.',
+   leftChoice: {text:'Scappi',                 id:+9,  ego:-8,  superego:-7,  log:"Hai evitato il legame. L'ES cerca liberta.",        defense:null},
+   rightChoice:{text:'Rimani',                 id:-6,  ego:+9,  superego:+8,  log:"Hai scelto la responsabilita.",                     defense:'identificazione'}},
+  {id:'p004',phase:2,tags:['art'],speaker:'Il tuo sogno',
+   text:'Puoi abbandonare un lavoro sicuro per seguire la tua passione artistica.',
+   leftChoice: {text:'Segui la passione',      id:+8,  ego:+6,  superego:-9,  log:"Hai ascoltato il desiderio creativo.",               defense:'sublimazione'},
+   rightChoice:{text:'Resti al lavoro',        id:-7,  ego:+4,  superego:+10, log:"La sicurezza prevale. Il dovere domina.",            defense:null}},
+  {id:'p005',phase:2,tags:['risk'],speaker:'Un amico',
+   text:'In un momento di crisi ti offre qualcosa per stare meglio — una sostanza.',
+   leftChoice: {text:'Accetti',                id:+13, ego:-10, superego:-11, mortal:false, log:"Hai cercato sollievo. Rischio dipendenza.", defense:'negazione'},
+   rightChoice:{text:'Rifiuti',                id:-5,  ego:+8,  superego:+8,  log:"Hai resistito. L'IO ha retto.",                      defense:null}},
+  {id:'p006',phase:2,tags:['anger'],speaker:'La tua rabbia',
+   text:'Un amico ti tradisce in modo grave. Potresti vendicarti o perdonare.',
+   leftChoice: {text:'Ti vendichi',            id:+11, ego:-7,  superego:-11, log:"La vendetta ha soddisfatto l'ES ma leso l'anima.",   defense:'spostamento'},
+   rightChoice:{text:'Perdoni',                id:-6,  ego:+9,  superego:+10, log:"Il perdono ha rafforzato l'IO.",                     defense:'altruismo'}},
+  {id:'p007',phase:2,tags:['grief'],speaker:'La morte',
+   text:'Perdi un genitore. Il dolore e insopportabile. Come lo affronti?',
+   leftChoice: {text:'Ti chiudi completamente', id:-4, ego:-11, superego:+5,  log:"Il lutto si trasforma in isolamento.",               defense:'intellettualizzazione'},
+   rightChoice:{text:'Piangi, cerchi sostegno', id:+3, ego:+10, superego:+3,  log:"Il lutto viene elaborato. L'IO resiste.",            defense:null}},
+  {id:'p008',phase:2,tags:['health'],speaker:'Il tuo corpo',
+   text:'Ignori segnali fisici di malessere per mesi pur di non interrompere il lavoro.',
+   leftChoice: {text:'Continui ad ignorare',   id:+4,  ego:-8,  superego:-5,  mortal:false, log:"Stai mettendo a rischio la salute.",  defense:'negazione'},
+   rightChoice:{text:'Vai dal medico',         id:-3,  ego:+10, superego:+7,  log:"Cura di te. L'IO si prende responsabilita.",         defense:null}},
+  {id:'p009',phase:2,tags:['identity'],speaker:'La piazza',
+   text:'Sei coinvolto in una causa. Ti chiedono azioni illegali per la causa.',
+   leftChoice: {text:'Partecipi',              id:+8,  ego:-8,  superego:-8,  mortal:false, log:"Hai messo l'ideale sopra la legge.",  defense:null},
+   rightChoice:{text:'Rimani nei limiti',      id:-5,  ego:+9,  superego:+8,  log:"Hai tenuto il confine. L'IO media.",                 defense:'razionalizzazione'}},
+
+  // ETA ADULTA (fase 3)
+  {id:'e001',phase:3,tags:['family'],speaker:'Tuo figlio',
+   text:'Tuo figlio adolescente ti confida qualcosa che ti spaventa. Reagisci con controllo o ascolto?',
+   leftChoice: {text:'Controlli e giudichi',   id:-4,  ego:-7,  superego:+12, log:"Il SUPER-IO ha parlato al posto dell'IO.",           defense:null},
+   rightChoice:{text:'Ascolti senza giudicare',id:+2,  ego:+12, superego:+3,  log:"L'IO maturo ha mediato. Profondo equilibrio.",       defense:null}},
+  {id:'e002',phase:3,tags:['work'],speaker:'Un collega',
+   text:'Scopri che un collega ruba sistematicamente all azienda. Lo denunci?',
+   leftChoice: {text:'Guardi dall altra parte', id:+6, ego:-8,  superego:-13, log:"Complice per quieto vivere. Il SUPER-IO e lesato.",   defense:'negazione'},
+   rightChoice:{text:'Denunci',                id:-7,  ego:+7,  superego:+13, log:"Integrita morale mantenuta.",                        defense:null}},
+  {id:'e003',phase:3,tags:['relationship'],speaker:'Il tradimento',
+   text:'Il tuo partner ti tradisce. Perdoni o rompi definitivamente?',
+   leftChoice: {text:'Perdoni e reprimi',      id:-5,  ego:-9,  superego:+7,  log:"Rimozione del dolore. L'IO si incrina.",             defense:'rimozione'},
+   rightChoice:{text:'Rompi e vai avanti',     id:+3,  ego:+11, superego:+4,  log:"L'IO ha scelto la dignita.",                        defense:null}},
+  {id:'e004',phase:3,tags:['meaning'],speaker:'Lo specchio a 50',
+   text:'Senti il vuoto della mezza eta. Ricominciare da zero o trovare senso in cio che hai?',
+   leftChoice: {text:'Ricominciare tutto',     id:+10, ego:-6,  superego:-8,  log:"Fuga dal presente. L'ES cerca rinascita.",           defense:'regressione'},
+   rightChoice:{text:'Integri passato e futuro',id:-4, ego:+12, superego:+7,  log:"Integrazione psichica matura.",                     defense:'sublimazione'}},
+  {id:'e005',phase:3,tags:['health'],speaker:'Il tuo medico',
+   text:'Ti diagnosticano una condizione cronica. Come la vivi?',
+   leftChoice: {text:'Neghi e ignori la terapia',id:+4,ego:-12, superego:-4,  mortal:true, log:"Negazione pericolosa. L'IO abdica.",    defense:'negazione'},
+   rightChoice:{text:'Affronti con realismo',  id:-3,  ego:+10, superego:+5,  log:"L'IO ha accettato la realta.",                      defense:'razionalizzazione'}},
+  {id:'e006',phase:3,tags:['power'],speaker:'Il potere',
+   text:'Ti viene offerta una posizione di grande potere che richiede compromessi morali continui.',
+   leftChoice: {text:'Accetti il potere',      id:+9,  ego:-6,  superego:-14, log:"Il potere logora lentamente l'anima.",               defense:'razionalizzazione'},
+   rightChoice:{text:'Declini',                id:-7,  ego:+8,  superego:+13, log:"Hai preservato l'integrita.",                       defense:null}},
+  {id:'e007',phase:3,tags:['help'],speaker:'Un estraneo',
+   text:'Vedi qualcuno in difficolta in strada. Hai molta fretta. Ti fermi?',
+   leftChoice: {text:'Passi oltre',            id:+5,  ego:-5,  superego:-10, log:"L'egoismo ha prevalso.",                            defense:null},
+   rightChoice:{text:'Ti fermi ad aiutare',    id:-4,  ego:+6,  superego:+11, log:"Altruismo genuino.",                                defense:'altruismo'}},
+  {id:'e008',phase:3,tags:['grief'],speaker:'La vecchiaia',
+   text:'Un vecchio amico muore. Il tuo primo pensiero e la tua stessa mortalita.',
+   leftChoice: {text:'Ti getti nel lavoro',    id:+4,  ego:-8,  superego:+4,  log:"Il lavoro come fuga dalla morte.",                  defense:'intellettualizzazione'},
+   rightChoice:{text:'Elabori il lutto',       id:-2,  ego:+10, superego:+5,  log:"Accettazione della mortalita. L'IO si approfondisce.", defense:null}},
+
+  // VECCHIAIA (fase 4)
+  {id:'v001',phase:4,tags:['meaning'],speaker:'I tuoi anni',
+   text:'Guardi indietro alla tua vita. Senti rimpianto per le strade non percorse.',
+   leftChoice: {text:'Il rimpianto ti consuma', id:-5, ego:-12, superego:+8,  log:"Il rimpianto divora. L'IO cede.",                   defense:null},
+   rightChoice:{text:'Accetti la tua storia',  id:+2,  ego:+12, superego:+5,  log:"Integrazione di vita. L'IO si completa.",           defense:'umorismo'}},
+  {id:'v002',phase:4,tags:['family'],speaker:'Un nipote',
+   text:'Tuo nipote ti chiede di parlargli onestamente degli errori che hai fatto.',
+   leftChoice: {text:'Menti per sembrare perfetto',id:+5,ego:-10,superego:-8, log:"Hai mantenuto la maschera. L'IO si distorce.",       defense:'negazione'},
+   rightChoice:{text:'Racconti la verita',     id:-3,  ego:+12, superego:+9,  log:"Onesta con la propria storia.",                     defense:null}},
+  {id:'v003',phase:4,tags:['death'],speaker:'Il silenzio',
+   text:'Pensi spesso alla morte. La cerchi di capire o la fuggi?',
+   leftChoice: {text:'La fuggi con ogni mezzo', id:+7, ego:-10, superego:-5,  log:"La fuga dalla morte logora l'IO.",                  defense:'negazione'},
+   rightChoice:{text:'La accetti come parte della vita',id:-3,ego:+12,superego:+7,log:"Saggezza tardiva. L'IO si completa.",            defense:'intellettualizzazione'}},
+  {id:'v004',phase:4,tags:['legacy'],speaker:'Le tue mani',
+   text:'Hai qualcosa di prezioso da lasciare. Lo doni a chi ne ha bisogno o ai tuoi familiari?',
+   leftChoice: {text:'Tienilo per i tuoi',     id:+4,  ego:-4,  superego:+5,  log:"Affetto familiare. Una scelta legittima.",           defense:null},
+   rightChoice:{text:'Lo doni a uno sconosciuto',id:-3,ego:+8,  superego:+10, log:"Generosita universale. Il SUPER-IO si eleva.",      defense:'altruismo'}},
+  {id:'v005',phase:4,tags:['health'],speaker:'Il medico',
+   text:'Ti propongono una terapia aggressiva che potrebbe prolungare la vita di qualche settimana.',
+   leftChoice: {text:'Accetti ogni terapia',   id:-4,  ego:-5,  superego:+7,  log:"La lotta alla morte a ogni costo affanna l'IO.",    defense:null},
+   rightChoice:{text:'Scegli la qualita di vita',id:+2,ego:+12, superego:+5,  log:"Saggezza e accettazione. L'IO in pace.",            defense:null}},
+  {id:'v006',phase:4,tags:['reconciliation'],speaker:'Un vecchio rancore',
+   text:'C e qualcuno con cui hai rotto da anni. Potresti cercare riconciliazione prima che sia tardi.',
+   leftChoice: {text:'Lasci perdere',          id:+3,  ego:-8,  superego:-7,  log:"Il risentimento chiude la porta.",                  defense:'proiezione'},
+   rightChoice:{text:'Cerchi riconciliazione', id:-2,  ego:+11, superego:+9,  log:"La guarigione arriva tardi ma arriva.",              defense:null}},
+  {id:'v007',phase:4,tags:['peace'],speaker:'La pace interiore',
+   text:'In silenzio, la notte, senti che la tua vita ha avuto un senso.',
+   leftChoice: {text:'Dubiti di tutto',        id:+3,  ego:-13, superego:+5,  log:"Il dubbio tardivo corrode l'IO.",                   defense:null},
+   rightChoice:{text:'Ti lasci cullare',       id:-2,  ego:+13, superego:+5,  log:"La serenita dell'IO integrato. Una fine degna.",    defense:'umorismo'}},
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = {};
+let currentCard = null;
+let isDragging = false;
+
+function freshState() {
+  return {
+    id:33, ego:34, superego:33,
+    age:6, phase:0,
+    defenses:[], pathologies:[],
+    cardsUsed: new Set(),
+    phaseCardsPlayed:0, totalCardsPlayed:0,
+    idModifier:0, sublimazione:false,
+    projezione:false, proiezione_used:false,
+    negazione:false, negazione_used:false,
+    spostamento:false, umorismo:false, umorismo_used:false,
+    regressionePenalty:false, narcisismoActive:false,
+    gameOver:false,
+  };
+}
+
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  state = freshState();
+  drawCard();
+  updateUI();
+  setupDrag();
+}
+
+function resetGame() {
+  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('event-log').innerHTML = '';
+  state = freshState();
+  currentCard = null;
+  drawCard();
+  updateUI();
+}
+
+// ═══════════════════════════════════════════════════════
+// CARDS
+// ═══════════════════════════════════════════════════════
+function getAvailableCards() {
+  return CARDS.filter(c => c.phase === state.phase && !state.cardsUsed.has(c.id));
+}
+
+function drawCard() {
+  let avail = getAvailableCards();
+  if (avail.length === 0) {
+    if (state.phase < 4) {
+      state.phase++;
+      state.phaseCardsPlayed = 0;
+      avail = getAvailableCards();
+      if (avail.length === 0) { triggerDeath('naturale'); return; }
+    } else { triggerDeath('naturale'); return; }
+  }
+  const ph = PHASES[state.phase];
+  const total = CARDS.filter(c => c.phase === state.phase).length;
+  state.age = Math.min(ph.ageEnd, Math.round(ph.ageStart + (state.phaseCardsPlayed / total) * (ph.ageEnd - ph.ageStart)));
+
+  currentCard = avail[Math.floor(Math.random() * avail.length)];
+  state.cardsUsed.add(currentCard.id);
+
+  const card = document.getElementById('card');
+  card.style.cssText = 'transition:none;transform:none;opacity:1;';
+  card.classList.remove('appear');
+  void card.offsetWidth;
+  card.classList.add('appear');
+
+  document.getElementById('card-speaker').textContent = currentCard.speaker;
+  document.getElementById('card-text').textContent = currentCard.text;
+  document.getElementById('card-hint').classList.remove('visible');
+  hideChoicePreviews();
+  updateChoicePreview('left', currentCard.leftChoice);
+  updateChoicePreview('right', currentCard.rightChoice);
+  setTimeout(() => { const h=document.getElementById('card-hint'); if(h) h.classList.add('visible'); }, 1400);
+  updateUI();
+}
+
+function hideChoicePreviews() {
+  document.getElementById('preview-left').classList.remove('show-left');
+  document.getElementById('preview-right').classList.remove('show-right');
+}
+
+function updateChoicePreview(side, choice) {
+  document.getElementById('preview-'+side+'-text').textContent = choice.text;
+  const fxEl = document.getElementById('preview-'+side+'-fx');
+  let pills = '';
+  if (choice.id)       pills += '<span class="effect-pill '+(choice.id>0?'up-id':'down-id')+'">ES '+(choice.id>0?'+':'')+choice.id+'</span>';
+  if (choice.ego)      pills += '<span class="effect-pill '+(choice.ego>0?'up-ego':'down-ego')+'">IO '+(choice.ego>0?'+':'')+choice.ego+'</span>';
+  if (choice.superego) pills += '<span class="effect-pill '+(choice.superego>0?'up-sup':'down-sup')+'">S-IO '+(choice.superego>0?'+':'')+choice.superego+'</span>';
+  if (choice.defense)  pills += '<span class="effect-pill def-pill">difesa</span>';
+  fxEl.innerHTML = pills;
+}
+
+// ═══════════════════════════════════════════════════════
+// CHOICE
+// ═══════════════════════════════════════════════════════
+function makeChoice(side) {
+  if (state.gameOver || !currentCard) return;
+  const choice = side === 'left' ? currentCard.leftChoice : currentCard.rightChoice;
+  const card = document.getElementById('card');
+  card.style.transition = 'transform 0.38s ease-in, opacity 0.38s';
+  card.style.transform = side === 'left' ? 'rotate(-28deg) translateX(-500px)' : 'rotate(28deg) translateX(500px)';
+  card.style.opacity = '0';
+  setTimeout(() => {
+    applyChoice(choice);
+    applyPathologyEffects();
+    checkPathologies();
+    checkDeath(choice);
+    if (!state.gameOver) {
+      state.phaseCardsPlayed++;
+      state.totalCardsPlayed++;
+      drawCard();
+    }
+  }, 400);
+}
+
+function applyChoice(choice) {
+  let idDelta = choice.id;
+  if (state.idModifier && choice.id > 0) idDelta = Math.round(choice.id * (1 + state.idModifier));
+  if (state.spostamento && idDelta > 8) idDelta = Math.round(idDelta * 0.7);
+
+  let egoDelta = choice.ego;
+  if (state.regressionePenalty && choice.id > 5) egoDelta -= 2;
+
+  state.id = clamp(state.id + idDelta, 0, 100);
+  state.ego = clamp(state.ego + egoDelta, 0, 100);
+
+  let supDelta = choice.superego;
+  if (state.narcisismoActive && choice.superego > 0 && choice.tags && choice.tags.includes && choice.tags.includes('help')) supDelta = 0;
+  state.superego = clamp(state.superego + supDelta, 0, 100);
+
+  if (state.sublimazione && currentCard && currentCard.tags && currentCard.tags.includes('art')) {
+    state.ego = clamp(state.ego + 3, 0, 100);
+  }
+
+  if (choice.defense && !state.defenses.includes(choice.defense)) {
+    acquireDefense(choice.defense, choice.log);
+  } else {
+    addLog(choice.log);
+    updateUI();
+  }
+}
+
+function applyPathologyEffects() {
+  for (const key of state.pathologies) {
+    const p = PATHOLOGIES[key];
+    if (p && p.ongoingEffect) p.ongoingEffect(state);
+  }
+  state.id = clamp(state.id, 0, 100);
+  state.ego = clamp(state.ego, 0, 100);
+  state.superego = clamp(state.superego, 0, 100);
+}
+
+function acquireDefense(defId, log) {
+  if (!DEFENSES[defId]) return;
+  const def = DEFENSES[defId];
+  state.defenses.push(defId);
+  def.effect(state);
+  addLog(log || '');
+  updateUI();
+  showPopup('defense', defId);
+}
+
+// ═══════════════════════════════════════════════════════
+// PATHOLOGIES + DEATH
+// ═══════════════════════════════════════════════════════
+function checkPathologies() {
+  for (const [key, patho] of Object.entries(PATHOLOGIES)) {
+    if (patho.condition(state) && !state.pathologies.includes(key)) {
+      if (state.projezione && !state.proiezione_used) {
+        state.proiezione_used = true;
+        showNotification('Proiezione ha bloccato: ' + patho.name);
+        continue;
+      }
+      state.pathologies.push(key);
+      addLog('Psicopatologia: ' + patho.name);
+      updatePathologiesUI();
+      showPopup('patho', key);
+      return;
+    }
+  }
+}
+
+function checkDeath(choice) {
+  if (state.ego <= 3) {
+    if (state.negazione && !state.negazione_used) {
+      state.negazione_used = true;
+      state.ego = 12;
+      showNotification("La Negazione ti ha salvato dal collasso dell'IO.");
+      return;
+    }
+    triggerDeath('collasso_ego'); return;
+  }
+  if (state.pathologies.length >= 4) {
+    if (state.umorismo && !state.umorismo_used) {
+      state.umorismo_used = true;
+      showNotification("L'Umorismo ha allontanato la catastrofe psichica.");
+      return;
+    }
+    triggerDeath('psicopatologia'); return;
+  }
+  if (choice.mortal && state.pathologies.length >= 2) triggerDeath('scelta_fatale');
+}
+
+function triggerDeath(cause) {
+  state.gameOver = true;
+  const titles = { collasso_ego:'Dissoluzione', psicopatologia:'La Psiche si Spezza', scelta_fatale:'Una Scelta di Troppo', naturale:'La Fine Naturale' };
+  const subs = {
+    collasso_ego: "L'IO, logorato dal conflitto tra le forze psichiche, non regge piu. La coscienza si dissolve.",
+    psicopatologia: "Le psicopatologie accumulate hanno consumato ogni riserva psichica. La mente non trova piu un porto sicuro.",
+    scelta_fatale: "Una scelta pericolosa in una psiche gia fragile ha fatto cedere l'ultimo equilibrio.",
+    naturale: "Hai vissuto un'intera vita. Come ogni storia umana, anche questa trova la sua conclusione."
+  };
+  document.getElementById('overlay-title').textContent = titles[cause] || 'Fine';
+  document.getElementById('overlay-sub').textContent = subs[cause] || '';
+  const pathoList = state.pathologies.map(p => PATHOLOGIES[p]?.name || p).join(', ') || 'Nessuna';
+  const defList = state.defenses.map(d => DEFENSES[d]?.name || d).join(', ') || 'Nessuno';
+  document.getElementById('overlay-stats').innerHTML =
+    'Eta raggiunta: ' + state.age + ' anni<br>ES: ' + state.id + ' — IO: ' + state.ego + ' — SUPER-IO: ' + state.superego +
+    '<br>Psicopatologie: ' + pathoList + '<br>Meccanismi: ' + defList;
+  document.getElementById('overlay').classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// POPUP
+// ═══════════════════════════════════════════════════════
+let popupQueue = [];
+let popupOpen = false;
+
+function showPopup(type, key) {
+  popupQueue.push({ type, key });
+  if (!popupOpen) processPopupQueue();
+}
+
+function processPopupQueue() {
+  if (popupQueue.length === 0) { popupOpen = false; return; }
+  popupOpen = true;
+  const { type, key } = popupQueue.shift();
+  if (type === 'defense') {
+    const def = DEFENSES[key];
+    if (!def) { popupOpen = false; processPopupQueue(); return; }
+    document.getElementById('popup-icon').textContent = def.icon;
+    document.getElementById('popup-title').textContent = 'Meccanismo di difesa acquisito';
+    document.getElementById('popup-title').style.color = '#2a9e99';
+    document.getElementById('popup-desc').textContent = def.name + ' — ' + def.desc;
+    document.getElementById('popup-effect').textContent = def.effectDesc;
+  } else {
+    const patho = PATHOLOGIES[key];
+    if (!patho) { popupOpen = false; processPopupQueue(); return; }
+    document.getElementById('popup-icon').textContent = patho.icon;
+    document.getElementById('popup-title').textContent = 'Psicopatologia emergente';
+    document.getElementById('popup-title').style.color = '#c93030';
+    document.getElementById('popup-desc').textContent = patho.name + ' — ' + patho.desc;
+    document.getElementById('popup-effect').textContent = patho.effectDesc;
+  }
+  document.getElementById('popup-overlay').classList.add('active');
+}
+
+function closePopup() {
+  document.getElementById('popup-overlay').classList.remove('active');
+  setTimeout(() => { popupOpen = false; processPopupQueue(); }, 150);
+}
+
+// ═══════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════
+function updateUI() {
+  setBar('id', state.id);
+  setBar('ego', state.ego);
+  setBar('superego', state.superego);
+  document.getElementById('age-num').textContent = state.age;
+  ['dot-0','dot-1','dot-2','dot-3','dot-4'].forEach((id, i) => {
+    const dot = document.getElementById(id);
+    dot.className = 'phase-dot';
+    if (i < state.phase) dot.classList.add('done');
+    if (i === state.phase) dot.classList.add('active');
+  });
+  document.getElementById('phase-label').textContent = PHASES[state.phase]?.name || '';
+  if (currentCard) {
+    const l = currentCard.leftChoice.text;
+    const r = currentCard.rightChoice.text;
+    document.getElementById('btn-left').textContent  = l.length > 24 ? l.slice(0,22)+'…' : l;
+    document.getElementById('btn-right').textContent = r.length > 24 ? r.slice(0,22)+'…' : r;
+  }
+  updatePathologiesUI();
+  updateDefensesUI();
+}
+
+function setBar(id, val) {
+  const fill = document.getElementById('bar-'+id);
+  const valEl = document.getElementById('val-'+id);
+  fill.style.width = val + '%';
+  valEl.textContent = val;
+  fill.classList.remove('danger-low','danger-high');
+  if (val <= 10) fill.classList.add('danger-high');
+  else if (val <= 20) fill.classList.add('danger-low');
+}
+
+function updatePathologiesUI() {
+  document.getElementById('pathologies-strip').innerHTML = state.pathologies.map(p => {
+    const patho = PATHOLOGIES[p];
+    return patho ? '<span class="patho-tag" onclick="showInfoPopup(\'patho\',\''+p+'\')">' + patho.icon + ' ' + patho.name + '</span>' : '';
+  }).join('');
+}
+
+function updateDefensesUI() {
+  document.getElementById('defenses-strip').innerHTML = state.defenses.map(d => {
+    const def = DEFENSES[d];
+    return def ? '<span class="defense-tag" onclick="showInfoPopup(\'defense\',\''+d+'\')">' + def.icon + ' ' + def.name + '</span>' : '';
+  }).join('');
+}
+
+function showInfoPopup(type, key) {
+  popupQueue.unshift({ type, key });
+  if (!popupOpen) processPopupQueue();
+}
+
+function addLog(text) {
+  if (!text) return;
+  const log = document.getElementById('event-log');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry fresh';
+  entry.textContent = text;
+  log.insertBefore(entry, log.firstChild);
+  setTimeout(() => entry.classList.remove('fresh'), 2500);
+  while (log.children.length > 8) log.removeChild(log.lastChild);
+}
+
+function showNotification(text) {
+  const n = document.getElementById('notification');
+  n.textContent = text;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3200);
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAG
+// ═══════════════════════════════════════════════════════
+function setupDrag() {
+  const card = document.getElementById('card');
+  let startX = 0;
+  let shown = '';
+
+  const onStart = (x) => {
+    if (state.gameOver) return;
+    isDragging = true;
+    startX = x;
+  };
+
+  const onMove = (x) => {
+    if (!isDragging) return;
+    const dx = x - startX;
+    const tilt = clamp(dx / 10, -20, 20);
+    const tx = clamp(dx * 0.4, -80, 80);
+    card.style.transition = 'none';
+    card.style.transform = 'rotate(' + tilt + 'deg) translateX(' + tx + 'px)';
+
+    if (dx < -40 && shown !== 'left') {
+      document.getElementById('preview-left').classList.add('show-left');
+      document.getElementById('preview-right').classList.remove('show-right');
+      shown = 'left';
+    } else if (dx > 40 && shown !== 'right') {
+      document.getElementById('preview-right').classList.add('show-right');
+      document.getElementById('preview-left').classList.remove('show-left');
+      shown = 'right';
+    } else if (Math.abs(dx) < 40 && shown) {
+      hideChoicePreviews();
+      shown = '';
+    }
+  };
+
+  const onEnd = (x) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const dx = x - startX;
+    if (dx < -90) { makeChoice('left'); }
+    else if (dx > 90) { makeChoice('right'); }
+    else {
+      card.style.transition = 'transform 0.3s ease';
+      card.style.transform = '';
+      hideChoicePreviews();
+    }
+    shown = '';
+  };
+
+  card.addEventListener('mousedown', e => onStart(e.clientX));
+  window.addEventListener('mousemove', e => { if (isDragging) onMove(e.clientX); });
+  window.addEventListener('mouseup', e => onEnd(e.clientX));
+  card.addEventListener('touchstart', e => onStart(e.touches[0].clientX), { passive:true });
+  window.addEventListener('touchmove', e => { if (isDragging) onMove(e.touches[0].clientX); }, { passive:true });
+  window.addEventListener('touchend', e => onEnd(e.changedTouches[0].clientX));
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+</script>
+</body>
+</html>
