@@ -2,1351 +2,388 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Psyche — Il Gioco dell'Anima</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PSYCHE — Il Gioco della Mente</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #130e08;
-  --bg2: #1e160d;
-  --parchment: #f5edda;
-  --parchment-mid: #d4b97a;
-  --parchment-dim: #9a7e50;
-  --ink: #1e1208;
-  --card-bg: #faf3e0;
-  --card-border: #b08c48;
-  --red: #c93030;
-  --red-dim: #8b1a1a;
-  --red-bg: rgba(139,26,26,0.18);
-  --teal: #2a9e99;
-  --teal-dim: #1a5c5a;
-  --teal-bg: rgba(26,92,90,0.18);
-  --gold: #c9a020;
-  --gold-dim: #8b6914;
-  --gold-bg: rgba(139,105,20,0.18);
-  --border: rgba(176,140,72,0.35);
-  --border-faint: rgba(176,140,72,0.18);
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#2c1e14;--bg2:#3a2a1c;--bg3:#4a3628;
+--card-bg:#f4ead5;--card-bg2:#e8dcc4;--card-border:#b8986a;
+--parchment:#f0e6d0;--parchment-dark:#d4c4a0;
+--es:#a83232;--io:#b8860b;--superio:#4a6741;
+--gold:#c9a84c;--gold-light:#e0c878;--gold-dim:#8a7034;
+--burgundy:#6b2d3e;--burgundy-light:#8c3d52;
+--velvet:#4a1a2a;--velvet2:#3d1522;
+--cream:#f5efe0;--cream-dim:#c8b898;
+--text-dark:#2c1e14;--text-medium:#5a4632;--text-light:#8a7456;
+--danger:#8b2020;--success:#4a6741;
+--font-display:'Playfair Display',Georgia,serif;
+--font-body:'Libre Baskerville',Georgia,serif;
+--font-accent:'Cormorant Garamond',Georgia,serif;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  font-family: 'Lora', Georgia, serif;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-#popup-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,2,0,0.85);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-#popup-overlay.active { display: flex; }
-#popup-box {
-  background: var(--bg2);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 28px 28px 22px;
-  max-width: 380px;
-  width: 100%;
-  text-align: center;
-}
-#popup-icon { font-size: 30px; margin-bottom: 10px; display: block; }
-#popup-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--parchment);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-}
-#popup-desc {
-  font-family: 'Lora', serif;
-  font-size: 15px;
-  color: var(--parchment-mid);
-  line-height: 1.75;
-  margin-bottom: 10px;
-}
-#popup-effect {
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  line-height: 1.6;
-  border-top: 1px solid var(--border-faint);
-  padding-top: 10px;
-  margin-bottom: 18px;
-}
-#popup-close {
-  background: transparent;
-  border: 1px solid var(--card-border);
-  color: var(--parchment-mid);
-  font-family: 'Playfair Display', serif;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 9px 28px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-#popup-close:hover { background: rgba(176,140,72,0.1); }
-#game-container {
-  position: relative;
-  z-index: 1;
-  width: 440px;
-  max-width: 98vw;
-  padding: 0 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-#header { text-align: center; margin-bottom: 12px; }
-#header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--parchment);
-  letter-spacing: 5px;
-  text-transform: uppercase;
-}
-#header .subtitle {
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  letter-spacing: 2px;
-  margin-top: 2px;
-}
-#status-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 10px;
-}
-#phase-dots { display: flex; gap: 5px; align-items: center; }
-.phase-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: rgba(244,234,213,0.15);
-  border: 1px solid rgba(244,234,213,0.3);
-  transition: all 0.4s;
-}
-.phase-dot.active { background: var(--parchment-mid); box-shadow: 0 0 7px rgba(200,160,80,0.6); }
-.phase-dot.done { background: rgba(244,234,213,0.45); }
-#phase-label {
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  color: var(--parchment-mid);
-  letter-spacing: 1px;
-  margin-left: 10px;
-}
-#age-display {
-  font-family: 'Playfair Display', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  letter-spacing: 2px;
-}
-#psyche-panel {
-  width: 100%;
-  background: rgba(15,9,3,0.7);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 14px;
-  margin-bottom: 8px;
-}
-.psyche-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.psyche-row:last-child { margin-bottom: 0; }
-.psyche-label {
-  font-family: 'Playfair Display', serif;
-  font-size: 13px;
-  font-weight: 700;
-  width: 80px;
-  flex-shrink: 0;
-  letter-spacing: 1px;
-}
-.psyche-label.id { color: var(--red); }
-.psyche-label.ego { color: var(--teal); }
-.psyche-label.superego { color: var(--gold); }
-.bar-track {
-  flex: 1;
-  height: 9px;
-  background: rgba(244,234,213,0.07);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
-}
-.bar-fill.id { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
-.bar-fill.ego { background: linear-gradient(90deg, var(--teal-dim), var(--teal)); }
-.bar-fill.superego { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
-.bar-fill.danger-low { animation: blink 1s ease-in-out infinite; }
-.bar-fill.danger-high { animation: blink 0.5s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.bar-val {
-  font-family: 'Lora', serif;
-  font-size: 12px;
-  width: 26px;
-  text-align: right;
-  color: var(--parchment-dim);
-}
-.strip {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 0 1px;
-}
-#pathologies-strip { margin-bottom: 5px; }
-#defenses-strip { margin-bottom: 8px; }
-.patho-tag, .defense-tag {
-  border-radius: 3px;
-  padding: 3px 9px;
-  font-family: 'Lora', serif;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 0.2s;
-}
-.patho-tag {
-  background: rgba(139,26,26,0.25);
-  border: 1px solid rgba(201,48,48,0.4);
-  color: #e07070;
-}
-.defense-tag {
-  background: rgba(26,92,90,0.25);
-  border: 1px solid rgba(42,158,153,0.4);
-  color: #60c0bb;
-}
-.patho-tag:hover, .defense-tag:hover { opacity: 0.75; }
-#card-container {
-  width: 100%;
-  position: relative;
-  height: 215px;
-  margin-bottom: 10px;
-}
-#card {
-  width: 100%;
-  height: 100%;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 18px 22px 14px;
-  position: relative;
-  overflow: hidden;
-  transform-origin: center bottom;
-  cursor: grab;
-  user-select: none;
-  will-change: transform;
-}
-#card:active { cursor: grabbing; }
-#card::before {
-  content: '';
-  position: absolute;
-  inset: 7px;
-  border: 1px solid rgba(160,120,64,0.18);
-  border-radius: 4px;
-  pointer-events: none;
-}
-@keyframes card-in {
-  from { transform: scale(0.88) translateY(24px); opacity: 0; }
-  to   { transform: scale(1)    translateY(0);    opacity: 1; }
-}
-#card.appear { animation: card-in 0.38s ease-out forwards; }
-.card-speaker {
-  font-family: 'Playfair Display', serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--parchment-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 9px;
-}
-.card-ornament {
-  text-align: center;
-  color: var(--card-border);
-  font-size: 13px;
-  margin-bottom: 9px;
-  opacity: 0.5;
-}
-#card-text {
-  font-family: 'Lora', serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--ink);
-  line-height: 1.6;
-  text-align: center;
-}
-#card-hint {
-  position: absolute;
-  bottom: 10px;
-  left: 0; right: 0;
-  text-align: center;
-  font-family: 'Lora', serif;
-  font-size: 11px;
-  color: var(--parchment-dim);
-  opacity: 0;
-  transition: opacity 0.4s;
-  letter-spacing: 1px;
-}
-#card-hint.visible { opacity: 1; }
-#choice-preview {
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
-  min-height: 66px;
-}
-.choice-panel {
-  flex: 1;
-  min-width: 0;
-  background: rgba(15,9,3,0.6);
-  border: 1px solid var(--border-faint);
-  border-radius: 5px;
-  padding: 8px 10px;
-  opacity: 0;
-  transition: opacity 0.25s, background 0.25s;
-}
-.choice-panel.show-left  { opacity:1; background: var(--red-bg);  border-left:  2px solid var(--red); }
-.choice-panel.show-right { opacity:1; background: var(--teal-bg); border-right: 2px solid var(--teal); }
-.choice-label {
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--parchment-mid);
-  line-height: 1.4;
-  margin-bottom: 5px;
-  word-break: break-word;
-}
-.choice-effects { display: flex; gap: 4px; flex-wrap: wrap; }
-.effect-pill {
-  font-family: 'Lora', serif;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-.up-id    { background: rgba(201,48,48,0.2);  color: #e08080; }
-.down-id  { background: rgba(201,48,48,0.1);  color: #a05050; }
-.up-ego   { background: rgba(42,158,153,0.2); color: #70c4c0; }
-.down-ego { background: rgba(42,158,153,0.1); color: #408080; }
-.up-sup   { background: rgba(201,160,32,0.2); color: #e0c040; }
-.down-sup { background: rgba(201,160,32,0.1); color: #a08020; }
-.def-pill { background: rgba(42,158,153,0.15); color: #60c0bb; }
-#btn-row { display: flex; gap: 10px; width: 100%; margin-bottom: 8px; }
-.choice-btn {
-  flex: 1;
-  min-width: 0;
-  padding: 11px 8px;
-  border: 1px solid;
-  border-radius: 5px;
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#btn-left  { background: var(--red-bg);  border-color: var(--red-dim);  color: var(--red); }
-#btn-right { background: var(--teal-bg); border-color: var(--teal-dim); color: var(--teal); }
-#btn-left:hover  { background: rgba(139,26,26,0.28); }
-#btn-right:hover { background: rgba(26,92,90,0.28); }
-#event-log {
-  width: 100%;
-  background: rgba(8,4,1,0.6);
-  border: 1px solid var(--border-faint);
-  border-radius: 5px;
-  padding: 8px 12px;
-  max-height: 62px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(160,120,64,0.3) transparent;
-}
-.log-entry {
-  font-family: 'Lora', serif;
-  font-size: 12px;
-  color: var(--parchment-dim);
-  line-height: 1.5;
-}
-.log-entry.fresh { color: var(--parchment-mid); }
-#overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(5,2,0,0.93);
-  z-index: 300;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 28px;
-  text-align: center;
-}
-#overlay.active { display: flex; }
-.overlay-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--parchment);
-  letter-spacing: 3px;
-  margin-bottom: 10px;
-}
-.overlay-sub {
-  font-family: 'Lora', serif;
-  font-size: 15px;
-  color: var(--parchment-mid);
-  max-width: 340px;
-  line-height: 1.75;
-  margin-bottom: 18px;
-}
-.overlay-stats {
-  font-family: 'Lora', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  margin-bottom: 26px;
-  line-height: 1.9;
-}
-#overlay-btn {
-  background: transparent;
-  border: 1px solid var(--card-border);
-  color: var(--parchment-mid);
-  font-family: 'Playfair Display', serif;
-  font-size: 13px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  padding: 11px 32px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-#overlay-btn:hover { background: rgba(176,140,72,0.1); }
-#notification {
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-90px);
-  background: var(--bg2);
-  border: 1px solid var(--card-border);
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-family: 'Lora', serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--parchment);
-  z-index: 400;
-  transition: transform 0.4s cubic-bezier(0.34,1.4,0.64,1);
-  max-width: 340px;
-  text-align: center;
-}
-#notification.show { transform: translateX(-50%) translateY(0); }
-#intro {
-  position: fixed;
-  inset: 0;
-  background: #0b0804;
-  z-index: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 32px;
-  gap: 16px;
-  text-align: center;
-}
-#intro h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--parchment);
-  letter-spacing: 7px;
-  text-transform: uppercase;
-}
-.intro-rule {
-  width: 100px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--card-border), transparent);
-}
-.intro-sub {
-  font-family: 'Lora', serif;
-  font-size: 15px;
-  color: var(--parchment-mid);
-  max-width: 340px;
-  line-height: 1.8;
-}
-.intro-legend {
-  font-family: 'Lora', serif;
-  font-size: 14px;
-  color: var(--parchment-dim);
-  max-width: 360px;
-  line-height: 2;
-}
-.l-id  { color: var(--red);  font-weight: 600; }
-.l-ego { color: var(--teal); font-weight: 600; }
-.l-sup { color: var(--gold); font-weight: 600; }
-#start-btn {
-  background: transparent;
-  border: 1px solid var(--card-border);
-  color: var(--parchment-mid);
-  font-family: 'Playfair Display', serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  padding: 13px 40px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s;
-  margin-top: 6px;
-}
-#start-btn:hover { background: rgba(176,140,72,0.1); letter-spacing: 6px; }
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font-body);background:var(--bg);color:var(--cream)}
+#app::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4}
+#app{width:100%;height:100%;display:flex;flex-direction:column;position:relative;max-width:500px;margin:0 auto;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 40%,var(--bg3) 100%);
+  border-left:1px solid rgba(201,168,76,.1);border-right:1px solid rgba(201,168,76,.1)}
+.art-nouveau-line{height:20px;background:transparent;position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 20px}
+.art-nouveau-line svg{width:100%;height:16px;opacity:.5}
+.stats-bar{padding:8px 16px 2px;flex-shrink:0;position:relative;z-index:10}
+.stats-bar .age-display{text-align:center;font-family:var(--font-accent);font-size:17px;color:var(--gold-light);margin-bottom:2px;letter-spacing:2px;font-weight:600}
+.stats-bar .phase-label{text-align:center;font-size:11px;color:var(--cream-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:3px;font-family:var(--font-accent)}
+.stat-row{display:flex;align-items:center;margin-bottom:4px;gap:8px}
+.stat-label{width:72px;font-size:12px;font-weight:700;text-align:right;flex-shrink:0;font-family:var(--font-accent);letter-spacing:1px}
+.stat-label.es{color:var(--es)}.stat-label.io{color:var(--io)}.stat-label.superio{color:var(--superio)}
+.stat-bar-outer{flex:1;height:12px;background:rgba(244,234,213,.08);border-radius:2px;overflow:hidden;position:relative;border:1px solid rgba(201,168,76,.15)}
+.stat-bar-inner{height:100%;border-radius:1px;transition:width .5s ease}
+.stat-bar-inner.es{background:linear-gradient(90deg,#6b2020,var(--es))}
+.stat-bar-inner.io{background:linear-gradient(90deg,#7a5a10,var(--io))}
+.stat-bar-inner.superio{background:linear-gradient(90deg,#2d4028,var(--superio))}
+.stat-val{width:24px;font-size:12px;font-weight:700;text-align:left;flex-shrink:0;font-family:var(--font-accent);color:var(--cream-dim)}
+.card-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:10px 16px;min-height:0}
+.card{position:absolute;width:calc(100% - 32px);max-width:360px;
+  background:var(--card-bg);
+  background-image:radial-gradient(ellipse at 30% 20%,rgba(232,220,196,.6),transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' type='fractalNoise'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.85 0 0 0 0 0.75 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23p)'/%3E%3C/svg%3E");
+  border-radius:4px;padding:22px 20px 18px;cursor:grab;user-select:none;touch-action:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 0 1px var(--card-border),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:opacity .25s;display:flex;flex-direction:column;max-height:calc(100% - 10px);overflow-y:auto;
+  border:2px solid var(--card-border);color:var(--text-dark)}
+.card.dragging{cursor:grabbing;transition:none}
+.card::after{content:'';position:absolute;inset:8px;border:1px solid rgba(184,152,106,.3);border-radius:2px;pointer-events:none}
+.card-phase{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-light);margin-bottom:4px;font-family:var(--font-accent);font-weight:600}
+.card-title{font-family:var(--font-display);font-size:20px;font-weight:700;line-height:1.3;margin-bottom:8px;color:var(--text-dark)}
+.card-desc{font-size:14px;line-height:1.55;color:var(--text-medium);margin-bottom:14px}
+.card-divider{text-align:center;margin:0 0 12px;color:var(--card-border);font-size:14px;letter-spacing:6px;opacity:.5}
+.card-choices{display:flex;gap:10px;margin-top:auto;position:relative;z-index:2}
+.card-choices .choice-btn{flex:1;padding:11px 8px;border:none;border-radius:3px;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;line-height:1.3;min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center}
+.choice-btn.left{background:linear-gradient(135deg,var(--velvet),var(--velvet2));color:var(--cream);border:1px solid rgba(201,168,76,.25);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.choice-btn.right{background:linear-gradient(135deg,var(--burgundy),var(--burgundy-light));color:var(--cream);border:1px solid rgba(201,168,76,.25);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.choice-btn:active{transform:scale(.96)}
+.card-preview{position:absolute;bottom:0;left:0;right:0;padding:8px 14px;border-radius:0 0 4px 4px;font-size:12px;font-weight:600;text-align:center;opacity:0;transition:opacity .15s;pointer-events:none;z-index:3}
+.card-preview.left{background:rgba(74,26,42,.9);color:var(--cream)}
+.card-preview.right{background:rgba(107,45,62,.9);color:var(--cream)}
+.card-preview.show{opacity:1}
+.swipe-hint{position:absolute;top:50%;transform:translateY(-50%);font-size:24px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5;color:var(--gold)}
+.swipe-hint.left{left:6px}.swipe-hint.right{right:6px}
+.bottom-bar{flex-shrink:0;padding:6px 16px 10px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-height:72px;overflow-y:auto}
+.badge{font-size:10px;padding:3px 8px;border-radius:2px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font-accent);letter-spacing:.5px;text-transform:uppercase}
+.badge.defense{background:rgba(74,103,65,.2);color:#8ab87a;border:1px solid rgba(74,103,65,.35)}
+.badge.psycho{background:rgba(139,32,32,.2);color:#d48a8a;border:1px solid rgba(139,32,32,.35)}
+.overlay{position:fixed;inset:0;background:rgba(20,12,8,.8);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(3px)}
+.modal{background:linear-gradient(145deg,var(--card-bg),var(--card-bg2));border-radius:4px;padding:26px 22px;max-width:380px;width:100%;max-height:85vh;overflow-y:auto;
+  box-shadow:0 12px 48px rgba(0,0,0,.6);border:2px solid var(--card-border);color:var(--text-dark);position:relative}
+.modal::after{content:'';position:absolute;inset:8px;border:1px solid rgba(184,152,106,.2);border-radius:2px;pointer-events:none}
+.modal h2{font-family:var(--font-display);font-size:21px;margin-bottom:6px;color:var(--text-dark)}
+.modal h3{font-size:14px;font-weight:700;margin:12px 0 4px;color:var(--gold-dim);font-family:var(--font-accent);text-transform:uppercase;letter-spacing:1px}
+.modal p{font-size:14px;line-height:1.55;color:var(--text-medium);margin-bottom:8px}
+.modal .effect{font-size:13px;color:var(--success);font-weight:700}
+.modal .neg-effect{color:var(--danger)}
+.modal-close{display:block;margin:16px auto 0;padding:10px 32px;border:none;border-radius:3px;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);
+  font-family:var(--font-accent);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);position:relative;z-index:2}
+#title-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;
+  background:var(--bg);background-image:radial-gradient(ellipse at 50% 80%,rgba(74,26,42,.3),transparent 60%),radial-gradient(ellipse at 50% 20%,rgba(58,42,28,.5),transparent 50%);
+  padding:30px;text-align:center}
+.couch-illustration{margin-bottom:20px;opacity:.7}
+#title-screen h1{font-family:var(--font-display);font-size:44px;font-weight:900;color:var(--gold-light);margin-bottom:4px;letter-spacing:4px;text-shadow:0 2px 12px rgba(201,168,76,.3)}
+#title-screen .subtitle{font-size:13px;color:var(--cream-dim);margin-bottom:20px;letter-spacing:4px;text-transform:uppercase;font-family:var(--font-accent)}
+.title-ornament{color:var(--gold-dim);font-size:16px;letter-spacing:8px;margin-bottom:16px;opacity:.5}
+#title-screen .tagline{font-size:14px;color:var(--cream-dim);line-height:1.7;margin-bottom:28px;max-width:340px;font-family:var(--font-body)}
+.play-btn{padding:14px 48px;border:none;border-radius:3px;background:linear-gradient(135deg,var(--burgundy),var(--burgundy-light));color:var(--cream);font-family:var(--font-accent);font-size:17px;font-weight:700;cursor:pointer;letter-spacing:2px;text-transform:uppercase;box-shadow:0 4px 20px rgba(107,45,62,.4);transition:transform .15s;border:1px solid rgba(201,168,76,.3)}
+.play-btn:active{transform:scale(.95)}
+#gameover-screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:200;background:var(--bg);background-image:radial-gradient(ellipse at 50% 50%,rgba(58,42,28,.4),transparent 60%);padding:30px;text-align:center}
+#gameover-screen.show{display:flex}
+#gameover-screen h1{font-family:var(--font-display);font-size:30px;color:var(--danger);margin-bottom:6px;letter-spacing:2px}
+#gameover-screen .go-cause{font-size:14px;color:var(--cream-dim);margin-bottom:16px;line-height:1.6;max-width:340px}
+#gameover-screen .go-summary{font-size:13px;color:var(--cream-dim);margin-bottom:20px;line-height:1.7;max-width:340px}
+#gameover-screen .go-summary b{color:var(--gold-light)}
+#gameover-screen.natural h1{color:var(--gold-light)}
+.notif{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:3px;font-size:13px;font-weight:700;z-index:150;opacity:0;transition:opacity .3s,top .3s;pointer-events:none;max-width:90%;text-align:center;font-family:var(--font-accent);letter-spacing:.5px;border:1px solid rgba(201,168,76,.2)}
+.notif.show{opacity:1;top:30px}
+.notif.defense-notif{background:rgba(74,103,65,.85);color:#c8e0b8}
+.notif.psycho-notif{background:rgba(107,32,32,.85);color:#e8b8b8}
+.notif.save-notif{background:rgba(138,112,52,.85);color:var(--cream)}
 </style>
 </head>
 <body>
-
-<div id="intro">
-  <h1>PSYCHE</h1>
-  <div class="intro-rule"></div>
-  <div class="intro-sub">Una vita intera si dipana attraverso le tue scelte. Mantieni l'equilibrio tra le forze dell'anima.</div>
-  <div class="intro-legend">
-    <span class="l-id">ES</span> — il piacere, l'istinto, il desiderio<br>
-    <span class="l-ego">IO</span> — la mediazione, il senso di realta<br>
-    <span class="l-sup">SUPER-IO</span> — la morale, il giudizio, l'ideale<br><br>
-    Lo squilibrio genera psicopatologie.<br>Le scelte costruiscono meccanismi di difesa.
+<div id="app">
+  <div id="title-screen">
+    <div class="couch-illustration">
+      <svg width="200" height="100" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 60 Q20 40 38 37 L155 32 Q175 30 178 45 L180 58 Q180 66 174 68 L28 72 Q20 72 20 66Z" fill="#5a3a28" stroke="#8a6a4a" stroke-width="1.5"/>
+        <path d="M26 56 Q30 42 40 40 L152 35 Q168 33 170 44 L172 56" fill="#6b4a34" stroke="#8a6a4a" stroke-width="1"/>
+        <path d="M14 62 Q6 62 6 50 L9 28 Q11 16 22 16 L32 16 Q38 16 38 24 L36 58" fill="#4a2a18" stroke="#8a6a4a" stroke-width="1.5"/>
+        <ellipse cx="30" cy="42" rx="13" ry="9" fill="#8c3d52" stroke="#a85a6a" stroke-width="1" opacity=".8"/>
+        <rect x="4" y="74" width="182" height="8" rx="1" fill="#6b2d3e" opacity=".35"/>
+        <rect x="16" y="75" width="22" height="6" rx="1" fill="#8a5a3a" opacity=".25"/>
+        <rect x="48" y="75" width="32" height="6" rx="1" fill="#c9a84c" opacity=".18"/>
+        <rect x="90" y="75" width="28" height="6" rx="1" fill="#8a5a3a" opacity=".25"/>
+        <rect x="128" y="75" width="38" height="6" rx="1" fill="#4a6741" opacity=".18"/>
+        <rect x="24" y="72" width="4" height="14" rx="1" fill="#3a2010"/>
+        <rect x="164" y="70" width="4" height="16" rx="1" fill="#3a2010"/>
+        <line x1="26" y1="86" x2="26" y2="93" stroke="#c9a84c" stroke-width=".8" opacity=".35"/>
+        <line x1="166" y1="86" x2="166" y2="93" stroke="#c9a84c" stroke-width=".8" opacity=".35"/>
+      </svg>
+    </div>
+    <h1>PSYCHE</h1>
+    <div class="subtitle">Il Gioco della Mente</div>
+    <div class="title-ornament">&#10086; &#10022; &#10086;</div>
+    <div class="tagline">Vivi un'intera vita attraverso le tue scelte. Bilancia le forze psichiche di Es, Io e Super-Io. Sopravvivi ai conflitti interiori e affronta le ombre del tuo inconscio.</div>
+    <button class="play-btn" onclick="startGame()">Inizia la Seduta</button>
   </div>
-  <button id="start-btn" onclick="startGame()">Inizia la vita</button>
+  <div id="gameover-screen">
+    <h1 id="go-title">FINE</h1>
+    <div class="go-cause" id="go-cause"></div>
+    <div class="go-summary" id="go-summary"></div>
+    <button class="play-btn" onclick="restartGame()">Nuova Seduta</button>
+  </div>
+  <div class="stats-bar" id="stats-bar">
+    <div class="age-display" id="age-display">Età: 5</div>
+    <div class="phase-label" id="phase-label">Infanzia</div>
+    <div class="stat-row"><div class="stat-label es">ES</div><div class="stat-bar-outer"><div class="stat-bar-inner es" id="bar-es" style="width:50%"></div></div><div class="stat-val" id="val-es">5</div></div>
+    <div class="stat-row"><div class="stat-label io">IO</div><div class="stat-bar-outer"><div class="stat-bar-inner io" id="bar-io" style="width:50%"></div></div><div class="stat-val" id="val-io">5</div></div>
+    <div class="stat-row"><div class="stat-label superio">SUPER-IO</div><div class="stat-bar-outer"><div class="stat-bar-inner superio" id="bar-superio" style="width:50%"></div></div><div class="stat-val" id="val-superio">5</div></div>
+  </div>
+  <div class="art-nouveau-line"><svg viewBox="0 0 300 16" xmlns="http://www.w3.org/2000/svg"><path d="M0 8 Q30 2 60 8 Q75 12 90 8 Q105 2 120 8 Q135 14 150 8 Q165 2 180 8 Q195 14 210 8 Q225 2 240 8 Q270 14 300 8" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity=".4"/><circle cx="150" cy="8" r="2" fill="#c9a84c" opacity=".4"/></svg></div>
+  <div class="card-area" id="card-area">
+    <div class="swipe-hint left" id="hint-left">&#9666;</div>
+    <div class="swipe-hint right" id="hint-right">&#9656;</div>
+  </div>
+  <div class="bottom-bar" id="bottom-bar"></div>
 </div>
-
-<div id="popup-overlay">
-  <div id="popup-box">
-    <span id="popup-icon"></span>
-    <div id="popup-title"></div>
-    <div id="popup-desc"></div>
-    <div id="popup-effect"></div>
-    <button id="popup-close" onclick="closePopup()">Continua</button>
-  </div>
-</div>
-
-<div id="game-container">
-  <div id="header">
-    <h1>Psyche</h1>
-    <div class="subtitle">Il Gioco dell'Anima</div>
-  </div>
-
-  <div id="status-row">
-    <div style="display:flex;align-items:center;">
-      <div id="phase-dots">
-        <div class="phase-dot" id="dot-0"></div>
-        <div class="phase-dot" id="dot-1"></div>
-        <div class="phase-dot" id="dot-2"></div>
-        <div class="phase-dot" id="dot-3"></div>
-        <div class="phase-dot" id="dot-4"></div>
-      </div>
-      <div id="phase-label">Infanzia</div>
-    </div>
-    <div id="age-display">Eta: <span id="age-num">6</span> anni</div>
-  </div>
-
-  <div id="psyche-panel">
-    <div class="psyche-row">
-      <div class="psyche-label id">ES</div>
-      <div class="bar-track"><div class="bar-fill id" id="bar-id" style="width:33%"></div></div>
-      <div class="bar-val" id="val-id">33</div>
-    </div>
-    <div class="psyche-row">
-      <div class="psyche-label ego">IO</div>
-      <div class="bar-track"><div class="bar-fill ego" id="bar-ego" style="width:34%"></div></div>
-      <div class="bar-val" id="val-ego">34</div>
-    </div>
-    <div class="psyche-row">
-      <div class="psyche-label superego">SUPER-IO</div>
-      <div class="bar-track"><div class="bar-fill superego" id="bar-superego" style="width:33%"></div></div>
-      <div class="bar-val" id="val-superego">33</div>
-    </div>
-  </div>
-
-  <div class="strip" id="pathologies-strip"></div>
-  <div class="strip" id="defenses-strip"></div>
-
-  <div id="card-container">
-    <div id="card">
-      <div class="card-speaker" id="card-speaker"></div>
-      <div class="card-ornament">&#10022;</div>
-      <div id="card-text">...</div>
-      <div id="card-hint">trascina la carta per scegliere</div>
-    </div>
-  </div>
-
-  <div id="choice-preview">
-    <div class="choice-panel left-panel" id="preview-left">
-      <div class="choice-label" id="preview-left-text"></div>
-      <div class="choice-effects" id="preview-left-fx"></div>
-    </div>
-    <div class="choice-panel right-panel" id="preview-right">
-      <div class="choice-label" id="preview-right-text"></div>
-      <div class="choice-effects" id="preview-right-fx"></div>
-    </div>
-  </div>
-
-  <div id="btn-row">
-    <button class="choice-btn" id="btn-left" onclick="makeChoice('left')">No</button>
-    <button class="choice-btn" id="btn-right" onclick="makeChoice('right')">Si</button>
-  </div>
-
-  <div id="event-log"></div>
-</div>
-
-<div id="overlay">
-  <div class="overlay-title" id="overlay-title">Fine</div>
-  <div class="overlay-sub" id="overlay-sub"></div>
-  <div class="overlay-stats" id="overlay-stats"></div>
-  <button id="overlay-btn" onclick="resetGame()">Ricomincia</button>
-</div>
-
-<div id="notification"></div>
-
+<div class="notif" id="notif"></div>
 <script>
-const PHASES = [
-  { name:'Infanzia',          ageStart:4,  ageEnd:11  },
-  { name:'Adolescenza',       ageStart:12, ageEnd:17  },
-  { name:'Prima eta adulta',  ageStart:18, ageEnd:35  },
-  { name:'Eta adulta',        ageStart:36, ageEnd:65  },
-  { name:'Vecchiaia',         ageStart:66, ageEnd:100 },
-];
-
-const DEFENSES = {
-  rimozione: {
-    name:'Rimozione', icon:'🫧',
-    desc:'Allontani dalla coscienza ricordi o impulsi dolorosi, come se non fossero mai esistiti.',
-    effectDesc:'Effetto nel gioco: riduce del 15% i danni futuri da scelte impulsive sull ES.',
-    effect: (st) => { st.idModifier -= 0.15; }
-  },
-  proiezione: {
-    name:'Proiezione', icon:'🪞',
-    desc:'Attribuisci agli altri i tuoi impulsi inaccettabili, vedendo in loro cio che non vuoi vedere in te.',
-    effectDesc:'Effetto nel gioco: blocca automaticamente la prima psicopatologia che si manifesta.',
-    effect: (st) => { st.projezione = true; }
-  },
-  razionalizzazione: {
-    name:'Razionalizzazione', icon:'🧠',
-    desc:'Giustifichi con argomenti razionali scelte che nascono da impulsi o emozioni.',
-    effectDesc:'Effetto nel gioco: IO +5 permanente.',
-    effect: (st) => { st.ego = Math.min(100, st.ego + 5); }
-  },
-  sublimazione: {
-    name:'Sublimazione', icon:'🎨',
-    desc:'Trasformi energie pulsionali in attivita creative, produttive e socialmente accettate.',
-    effectDesc:'Effetto nel gioco: ogni scelta creativa ti dona +3 IO aggiuntivi.',
-    effect: (st) => { st.sublimazione = true; }
-  },
-  negazione: {
-    name:'Negazione', icon:'🚫',
-    desc:'Rifiuti di riconoscere la realta di eventi o situazioni troppo dolorosi da accettare.',
-    effectDesc:'Effetto nel gioco: se l IO crolla a zero, ti salva una volta riportandolo a 12.',
-    effect: (st) => { st.negazione = true; }
-  },
-  regressione: {
-    name:'Regressione', icon:'👶',
-    desc:'Torni a comportamenti tipici di fasi evolutive precedenti quando sei sotto stress.',
-    effectDesc:'Effetto nel gioco: ES +6 permanente, ma le scelte impulsive costano -2 IO aggiuntivi.',
-    effect: (st) => { st.id = Math.min(100, st.id + 6); st.regressionePenalty = true; }
-  },
-  formazione_reattiva: {
-    name:'Formazione reattiva', icon:'🎭',
-    desc:'Esprimi sentimenti esattamente opposti a quelli reali per mascherare impulsi inaccettabili.',
-    effectDesc:'Effetto nel gioco: SUPER-IO +5 permanente.',
-    effect: (st) => { st.superego = Math.min(100, st.superego + 5); }
-  },
-  intellettualizzazione: {
-    name:'Intellettualizzazione', icon:'📚',
-    desc:'Usi il pensiero astratto e la logica per distanziarti dal peso emotivo delle esperienze.',
-    effectDesc:'Effetto nel gioco: IO +3 e ES -3 permanente.',
-    effect: (st) => { st.ego = Math.min(100, st.ego + 3); st.id = Math.max(0, st.id - 3); }
-  },
-  spostamento: {
-    name:'Spostamento', icon:'↔',
-    desc:'Redirigi le emozioni intense, specie la rabbia, verso oggetti o persone piu sicuri.',
-    effectDesc:'Effetto nel gioco: riduce del 30% il danno da scelte aggressive.',
-    effect: (st) => { st.spostamento = true; }
-  },
-  identificazione: {
-    name:'Identificazione', icon:'🪆',
-    desc:'Ti conformi a una figura di autorita o modello, assorbendone valori e comportamenti.',
-    effectDesc:'Effetto nel gioco: SUPER-IO +6 permanente.',
-    effect: (st) => { st.superego = Math.min(100, st.superego + 6); }
-  },
-  umorismo: {
-    name:'Umorismo', icon:'😄',
-    desc:'Usi la leggerezza e l ironia per elaborare situazioni dolorose senza negarle davvero.',
-    effectDesc:'Effetto nel gioco: protegge da un game over per accumulo di psicopatologie.',
-    effect: (st) => { st.umorismo = true; }
-  },
-  altruismo: {
-    name:'Altruismo', icon:'🤝',
-    desc:'Ti dedichi al benessere degli altri come modo per sublimare i tuoi bisogni non soddisfatti.',
-    effectDesc:'Effetto nel gioco: IO +3 e SUPER-IO +3 permanente.',
-    effect: (st) => { st.ego = Math.min(100, st.ego + 3); st.superego = Math.min(100, st.superego + 3); }
-  },
+let G={es:5,io:5,superio:5,age:5,phase:0,cards:0,defenses:[],psychos:[],alive:true,deathSaves:{}};
+const PHASES=["Infanzia","Adolescenza","Prima Età Adulta","Età Adulta","Vecchiaia"];
+const clamp=(v,a=0,b=10)=>Math.max(a,Math.min(b,v));
+const DEFENSES={
+rimozione:{name:"Rimozione",desc:"La mente allontana dalla coscienza ricordi e impulsi troppo dolorosi, come se non fossero mai esistiti.",effect:"Le carte che abbassano l'IO di 2+ punti vengono ridotte di 1 punto.",fx:s=>{}},
+proiezione:{name:"Proiezione",desc:"Attribuisci agli altri sentimenti o impulsi che in realtà sono tuoi. È più facile vedere i difetti fuori che dentro.",effect:"Quando l'ES sale sopra 8, il Super-Io non scende. Salvataggio da morte 1 volta.",fx:s=>{}},
+sublimazione:{name:"Sublimazione",desc:"Trasformi impulsi primitivi in attività socialmente accettabili: arte, sport, lavoro creativo.",effect:"Ogni scelta che alza l'ES di 2+ alza anche l'IO di 1.",fx:s=>{}},
+umorismo:{name:"Umorismo",desc:"Ridi delle difficoltà come scudo contro il dolore. Una battuta può salvare la psiche dal crollo.",effect:"Salvataggio da morte per collasso psichico 1 volta. Le perdite di IO sono ridotte di 1.",fx:s=>{}},
+intellettualizzazione:{name:"Intellettualizzazione",desc:"Analizzi tutto razionalmente per evitare di sentire le emozioni. La logica diventa il tuo rifugio.",effect:"Il Super-Io non può scendere sotto 3. +1 IO permanente.",fx:s=>{s.io=clamp(s.io+1)}},
+negazione:{name:"Negazione",desc:"Rifiuti di accettare una realtà dolorosa. Se non la vedi, non esiste... almeno per un po'.",effect:"Salvataggio da morte 1 volta. Le psicopatologie si attivano 1 carta dopo.",fx:s=>{}},
+regressione:{name:"Regressione",desc:"Torni a comportamenti di fasi precedenti della vita quando lo stress è troppo forte.",effect:"Quando l'IO scende sotto 4, recuperi +1 IO automaticamente.",fx:s=>{}},
+formazione_reattiva:{name:"Formazione Reattiva",desc:"Trasformi un impulso inaccettabile nel suo esatto opposto. Odi qualcuno? Lo tratti con gentilezza esagerata.",effect:"Quando l'ES sale, il Super-Io sale della stessa quantità (max +1).",fx:s=>{}},
+spostamento:{name:"Spostamento",desc:"Dirigi emozioni intense verso un bersaglio meno minaccioso. Non puoi arrabbiarti col capo, ma col cuscino sì.",effect:"Le perdite di Super-Io sono ridotte di 1 punto.",fx:s=>{}},
+razionalizzazione:{name:"Razionalizzazione",desc:"Trovi spiegazioni logiche e accettabili per comportamenti dettati da impulsi inconsci.",effect:"+1 Super-Io permanente. Le scelte che alzano ES non abbassano Super-Io.",fx:s=>{s.superio=clamp(s.superio+1)}},
+identificazione:{name:"Identificazione con l'Aggressore",desc:"Adotti i tratti di chi ti minaccia per sentirti meno vulnerabile. Se non puoi batterli, diventa come loro.",effect:"+2 ES permanente ma -1 IO. L'ES non può scendere sotto 3.",fx:s=>{s.es=clamp(s.es+2);s.io=clamp(s.io-1)}},
+scissione:{name:"Scissione",desc:"Dividi il mondo in tutto buono o tutto cattivo, senza sfumature. Le persone sono angeli o demoni.",effect:"Gli effetti delle carte sono amplificati: +1 a ogni modifica positiva, -1 a ogni negativa.",fx:s=>{}}
 };
-
-const PATHOLOGIES = {
-  isteria: {
-    name:'Isteria', icon:'🌊',
-    desc:'L ES domina incontrastato. Il corpo esprime cio che la mente non riesce ad elaborare.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -1. Le scelte impulsive causano +3 ES extra.',
-    condition: (st) => st.id > 70 && st.superego < 30,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 1); }
-  },
-  nevrosi_ossessiva: {
-    name:'Nevrosi ossessiva', icon:'🔁',
-    desc:'Il SUPER-IO soffoca ogni impulso. Rituali e pensieri ripetitivi colonizzano la mente.',
-    effectDesc:'Effetto nel gioco: ogni turno ES -1. Le scelte moralmente rigorose aumentano SUPER-IO di +3 extra.',
-    condition: (st) => st.superego > 75 && st.id < 25,
-    ongoingEffect: (st) => { st.id = Math.max(0, st.id - 1); }
-  },
-  narcisismo: {
-    name:'Narcisismo', icon:'💫',
-    desc:'L ES si espande senza argini. L IO non regge piu il senso di grandiosita del se.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -1. Le scelte altruistiche non aumentano piu il SUPER-IO.',
-    condition: (st) => st.id > 65 && st.ego < 30,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 1); st.narcisismoActive = true; }
-  },
-  depressione: {
-    name:'Depressione', icon:'🌑',
-    desc:'Il SUPER-IO si rivolta contro l IO. Il senso di colpa diventa sistematicamente autodistruttivo.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -2 e SUPER-IO +1.',
-    condition: (st) => st.superego > 70 && st.ego < 25,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); st.superego = Math.min(100, st.superego + 1); }
-  },
-  borderline: {
-    name:'Disturbo borderline', icon:'⚡',
-    desc:'Violenta instabilita tra impulso e vuoto identitario. I confini del se si dissolvono.',
-    effectDesc:'Effetto nel gioco: ogni turno tutte le forze oscillano casualmente di +/-2.',
-    condition: (st) => st.id > 60 && st.superego < 25,
-    ongoingEffect: (st) => {
-      const r = () => (Math.random() > 0.5 ? 2 : -2);
-      st.id = clamp(st.id + r(), 0, 100);
-      st.ego = clamp(st.ego + r(), 0, 100);
-      st.superego = clamp(st.superego + r(), 0, 100);
-    }
-  },
-  paranoia: {
-    name:'Paranoia', icon:'👁',
-    desc:'Il conflitto interiore si proietta nel mondo esterno come minaccia persecutoria.',
-    effectDesc:'Effetto nel gioco: ogni turno SUPER-IO +2. Le scelte sociali costano -2 IO extra.',
-    condition: (st) => st.superego > 65 && st.id > 55,
-    ongoingEffect: (st) => { st.superego = Math.min(100, st.superego + 2); }
-  },
-  ansia_generalizzata: {
-    name:'Ansia generalizzata', icon:'😰',
-    desc:'L IO non regge piu la tensione tra ES e SUPER-IO. L angoscia diventa pervasiva.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -2. Le scelte di evitamento costano -2 IO extra.',
-    condition: (st) => st.ego < 20,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); }
-  },
-  fobia: {
-    name:'Fobia', icon:'😨',
-    desc:'L angoscia si concentra su un oggetto specifico. L evitamento diventa stile di vita.',
-    effectDesc:'Effetto nel gioco: ogni turno ES +1 e IO -1.',
-    condition: (st) => st.id > 55 && st.superego > 55 && st.ego < 35,
-    ongoingEffect: (st) => { st.id = Math.min(100, st.id + 1); st.ego = Math.max(0, st.ego - 1); }
-  },
-  dissociazione: {
-    name:'Dissociazione', icon:'🌫',
-    desc:'ES e SUPER-IO si sono allontanati oltre ogni limite. L IO perde la coerenza del se.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -3.',
-    condition: (st) => Math.abs(st.id - st.superego) > 60,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 3); }
-  },
-  melancolia: {
-    name:'Melancolia', icon:'🕯',
-    desc:'La perdita si e insediata nel nucleo dell IO. Il lutto non riesce mai a concludersi.',
-    effectDesc:'Effetto nel gioco: ogni turno IO -2 e SUPER-IO +2.',
-    condition: (st) => st.ego < 15 && st.superego > 60,
-    ongoingEffect: (st) => { st.ego = Math.max(0, st.ego - 2); st.superego = Math.min(100, st.superego + 2); }
-  },
+const PSYCHOS={
+narcisismo:{name:"Narcisismo",desc:"Un senso grandioso di sé maschera un IO fragile. L'ES domina con bisogni di ammirazione costante.",effect:"L'IO perde 1 punto extra ogni 3 carte.",cond:s=>s.es>=8&&s.io<=4},
+nevrosi_ossessiva:{name:"Nevrosi Ossessiva",desc:"Il Super-Io ipertrofico genera rituali, dubbi e sensi di colpa paralizzanti.",effect:"Il Super-Io non può più scendere naturalmente. -1 ES ogni 4 carte.",cond:s=>s.superio>=9&&s.es<=3},
+isteria:{name:"Isteria di Conversione",desc:"Conflitti psichici repressi si manifestano nel corpo: paralisi, cecità, dolori senza causa organica.",effect:"-1 IO ogni 4 carte. Le carte di relazione hanno effetti doppi.",cond:s=>s.superio>=7&&s.es>=7&&s.io<=4},
+ansia_generalizzata:{name:"Ansia Generalizzata",desc:"L'IO è troppo debole per mediare tra Es e Super-Io. Un'angoscia diffusa pervade ogni momento.",effect:"-1 IO ogni 3 carte. Ogni scelta costa 1 IO extra.",cond:s=>s.io<=3},
+depressione:{name:"Depressione Maggiore",desc:"L'aggressività del Super-Io si rivolge contro il sé. Tutto sembra vuoto e senza speranza.",effect:"-1 IO e -1 ES ogni 4 carte. Le scelte positive hanno effetto dimezzato.",cond:s=>s.superio>=8&&s.es<=2&&s.io<=5},
+disturbo_borderline:{name:"Disturbo Borderline",desc:"L'identità è frammentata tra idealizzazione e svalutazione. Le emozioni oscillano violentemente.",effect:"Le statistiche oscillano di ±1 casualmente ogni 2 carte.",cond:s=>s.es>=7&&s.io<=3&&s.superio<=4},
+fobia:{name:"Disturbo Fobico",desc:"L'angoscia viene proiettata su un oggetto specifico. Evitare diventa l'unico modo per sopravvivere.",effect:"1 scelta su 3 viene sostituita con 'Evita' (nessun effetto positivo, +1 Super-Io).",cond:s=>s.superio>=7&&s.io<=4&&s.es<=5},
+dipendenza:{name:"Disturbo da Dipendenza",desc:"L'ES cerca gratificazione immediata senza freni. Il piacere diventa l'unica ragione di vita.",effect:"+1 ES ogni 3 carte. Le scelte che alzano ES danno il doppio.",cond:s=>s.es>=9&&s.superio<=2},
+somatizzazione:{name:"Disturbo Psicosomatico",desc:"Il corpo parla quando la mente non riesce. Dolori, stanchezza cronica, malesseri senza causa.",effect:"-1 a tutte le statistiche ogni 5 carte.",cond:s=>s.io<=4&&s.es>=5&&s.superio>=5},
+dissociazione:{name:"Disturbo Dissociativo",desc:"La mente si disconnette da sé stessa per proteggersi. Depersonalizzazione, amnesia, distacco dalla realtà.",effect:"Alcune carte non hanno effetto (la mente si disconnette). -1 IO ogni 5 carte.",cond:s=>s.io<=3&&s.psychos.length>=2}
 };
-
-const CARDS = [
-  // INFANZIA (fase 0)
-  {id:'c001',phase:0,tags:['family'],speaker:'Tua madre',
-   text:'Piangi nel letto di notte. Tua madre entra nella stanza. Ti lascia dormire con lei o ti dice di tornare nel tuo letto?',
-   leftChoice: {text:'Dormi con lei',          id:+8,  ego:-4,  superego:-3,  log:"Hai cercato conforto fisico. L'ES e rinvigorito.",  defense:null},
-   rightChoice:{text:'Rimani nel tuo letto',   id:-5,  ego:+3,  superego:+7,  log:"Hai tollerato la solitudine. Il SUPER-IO cresce.",  defense:'negazione'}},
-  {id:'c002',phase:0,tags:['play'],speaker:'Il tuo compagno',
-   text:'Ti propone di rompere il vaso della vicina per divertimento. E solo un gioco, no?',
-   leftChoice: {text:'Lo rompi',               id:+10, ego:-6,  superego:-8,  log:"Hai ceduto all'impulso. L'ES esulta.",               defense:null},
-   rightChoice:{text:'Rifiuti',                id:-6,  ego:+4,  superego:+9,  log:"Hai resistito. Il SUPER-IO si consolida.",           defense:null}},
-  {id:'c003',phase:0,tags:['school'],speaker:'La maestra',
-   text:'Ti chiede di leggere ad alta voce davanti alla classe. Hai paura di sbagliare.',
-   leftChoice: {text:'Fingi di stare male',    id:+4,  ego:-7,  superego:-4,  log:"Hai evitato l'esposizione. Regressione in atto.",    defense:'regressione'},
-   rightChoice:{text:'Leggi, tremante',        id:-3,  ego:+8,  superego:+5,  log:"Hai affrontato la paura. L'IO si rafforza.",         defense:null}},
-  {id:'c004',phase:0,tags:['desire'],speaker:'La tua voce',
-   text:'Vuoi disperatamente il giocattolo del tuo amico. Potresti prenderlo mentre non guarda.',
-   leftChoice: {text:'Lo prendi',              id:+12, ego:-8,  superego:-12, log:"Hai rubato senza rimorso. L'ES domina.",              defense:null},
-   rightChoice:{text:'Chiedi il permesso',     id:-5,  ego:+5,  superego:+10, log:"Hai mediato il desiderio. L'IO regge.",              defense:'razionalizzazione'}},
-  {id:'c005',phase:0,tags:['family'],speaker:'Tuo padre',
-   text:'Tuo padre ti punisce ingiustamente davanti a tutti. La rabbia e incontenibile.',
-   leftChoice: {text:'Piangi e urli',          id:+9,  ego:-5,  superego:-4,  log:"Hai espresso tutto. L'ES si sfoga.",                 defense:null},
-   rightChoice:{text:'Inghiotti la rabbia',    id:-6,  ego:+3,  superego:+8,  log:"Hai rimosso la rabbia. Un meccanismo si forma.",     defense:'rimozione'}},
-  {id:'c006',phase:0,tags:['imagination'],speaker:'La tua fantasia',
-   text:'Inventi un amico immaginario con cui vivere avventure segrete ogni sera prima di dormire.',
-   leftChoice: {text:'Ti immergi completamente',id:+7, ego:-3,  superego:-2,  log:"La fantasia nutre l'ES. Uno spazio libero.",         defense:null},
-   rightChoice:{text:'Rinunci, e da bambini',  id:-7,  ego:+4,  superego:+6,  log:"Hai rinunciato alla fantasia per dovere.",           defense:'formazione_reattiva'}},
-  {id:'c007',phase:0,tags:['school'],speaker:'Un compagno',
-   text:'Ti offre di copiare il compito. Sei stanco di studiare e l esame e domani.',
-   leftChoice: {text:'Copi',                   id:+8,  ego:-5,  superego:-10, log:"Hai scelto la via facile. Il SUPER-IO soffre.",      defense:null},
-   rightChoice:{text:'Rifiuti',                id:-4,  ego:+3,  superego:+11, log:"Hai resistito alla tentazione.",                     defense:null}},
-  {id:'c008',phase:0,tags:['family'],speaker:'Tua sorella',
-   text:'Tua sorella ha paura del buio. Potresti darle il tuo orsetto, ma ci sei molto affezionato.',
-   leftChoice: {text:'Tienilo per te',         id:+5,  ego:-4,  superego:-8,  log:"Hai privilegiato il tuo conforto.",                 defense:null},
-   rightChoice:{text:'Glielo offri',           id:-4,  ego:+6,  superego:+9,  log:"Gesto altruistico. IO e SUPER-IO crescono.",        defense:'altruismo'}},
-
-  // ADOLESCENZA (fase 1)
-  {id:'a001',phase:1,tags:['body'],speaker:'Lo specchio',
-   text:'Guardi il tuo corpo che cambia. Senti un desiderio che non sai ancora come chiamare.',
-   leftChoice: {text:'Esplori da solo',        id:+10, ego:-4,  superego:-6,  log:"Hai esplorato la sessualita. L'ES si risveglia.",    defense:null},
-   rightChoice:{text:'Reprimi tutto',          id:-8,  ego:+3,  superego:+12, log:"Hai represso ogni impulso. Il SUPER-IO si ipertrofizza.", defense:'rimozione'}},
-  {id:'a002',phase:1,tags:['peer'],speaker:'I tuoi amici',
-   text:'Al parco ti offrono sigarette. "Provaci, sei uno di noi." Il gruppo ti guarda.',
-   leftChoice: {text:'Fumi',                   id:+11, ego:-5,  superego:-9,  log:"Hai ceduto alla pressione. L'ES gioisce.",           defense:null},
-   rightChoice:{text:'Rifiuti',                id:-6,  ego:+5,  superego:+10, log:"Hai resistito. L'identita si consolida.",            defense:'razionalizzazione'}},
-  {id:'a003',phase:1,tags:['love'],speaker:'Il tuo primo amore',
-   text:'Ti chiede di uscire. Hai una paura enorme del rifiuto. Accetti?',
-   leftChoice: {text:'Rifiuti per paura',      id:-4,  ego:-6,  superego:+3,  log:"Hai evitato il rischio. L'IO si indebolisce.",       defense:'negazione'},
-   rightChoice:{text:'Dici si con coraggio',   id:+6,  ego:+9,  superego:+3,  log:"Coraggio. L'IO ha mediato paura e desiderio.",      defense:null}},
-  {id:'a004',phase:1,tags:['anger'],speaker:'Il professore',
-   text:'Ti umilia davanti a tutti. La rabbia e incontenibile. Come rispondi?',
-   leftChoice: {text:'Esplodi di rabbia',      id:+13, ego:-9,  superego:-7,  log:"Hai risposto con aggressivita. L'ES domina.",        defense:null},
-   rightChoice:{text:'Rispondi con ironia',    id:-3,  ego:+7,  superego:+2,  log:"Hai usato l'umorismo come scudo. Difesa matura.",    defense:'umorismo'}},
-  {id:'a005',phase:1,tags:['art'],speaker:'La tua mano',
-   text:'Scopri di saper disegnare molto bene. Potresti passare ore a farlo invece di studiare.',
-   leftChoice: {text:'Disegni ogni sera',      id:+6,  ego:+4,  superego:-5,  log:"L'arte canalizza gli impulsi. Sublimazione in atto.",defense:'sublimazione'},
-   rightChoice:{text:'Il dovere prima',        id:-5,  ego:+3,  superego:+9,  log:"Hai rinunciato al piacere per il dovere.",           defense:null}},
-  {id:'a006',phase:1,tags:['peer'],speaker:'I social network',
-   text:'Bulli online ti prendono di mira. Rispondi con insulti o blocchi e segnali?',
-   leftChoice: {text:'Rispondi con insulti',   id:+10, ego:-8,  superego:-10, log:"Hai contrattaccato. Il danno si moltiplica.",         defense:null},
-   rightChoice:{text:'Blocchi e segnali',      id:-4,  ego:+8,  superego:+7,  log:"Scelta matura. L'IO gestisce il conflitto.",         defense:'intellettualizzazione'}},
-  {id:'a007',phase:1,tags:['family'],speaker:'La tua coscienza',
-   text:'Scopri che i tuoi genitori ti mentono su qualcosa di importante. Li confronti?',
-   leftChoice: {text:'Li confronti',           id:-4,  ego:+11, superego:+5,  log:"Hai scelto la verita. L'IO matura.",                 defense:null},
-   rightChoice:{text:'Fai finta di niente',    id:+5,  ego:-7,  superego:-3,  log:"Hai scelto la negazione. Piu comoda ma costosa.",    defense:'negazione'}},
-  {id:'a008',phase:1,tags:['risk'],speaker:'Un amico',
-   text:'Ti propone di rubare qualcosa da un negozio solo per il brivido.',
-   leftChoice: {text:'Partecipi',              id:+12, ego:-6,  superego:-14, log:"Hai rubato. Il SUPER-IO crolla.",                    defense:null},
-   rightChoice:{text:'Rifiuti con fermezza',   id:-7,  ego:+5,  superego:+12, log:"Integrita mantenuta.",                              defense:null}},
-  {id:'a009',phase:1,tags:['body'],speaker:'La bilancia',
-   text:'Sei insoddisfatto del tuo corpo. Pensi di smettere di mangiare per qualche giorno.',
-   leftChoice: {text:'Smetti di mangiare',     id:-6,  ego:-9,  superego:+8,  log:"Autodistruzione per l'ideale. Il SUPER-IO punisce.", defense:null},
-   rightChoice:{text:'Parli con qualcuno',     id:+2,  ego:+10, superego:+3,  log:"Hai cercato aiuto. L'IO si rafforza.",               defense:'altruismo'}},
-
-  // PRIMA ETA ADULTA (fase 2)
-  {id:'p001',phase:2,tags:['sex'],speaker:'La sera',
-   text:'Incontri qualcuno di attraente a una festa. Non vi conoscete. Ti invita a casa sua.',
-   leftChoice: {text:'Vai senza esitare',      id:+14, ego:-5,  superego:-12, log:"Hai seguito l'istinto puro. L'ES trionfa.",          defense:null},
-   rightChoice:{text:'Declini educatamente',   id:-7,  ego:+4,  superego:+11, log:"Hai posto un limite. Il SUPER-IO e riconoscente.",   defense:null}},
-  {id:'p002',phase:2,tags:['work'],speaker:'Il tuo capo',
-   text:'Ti offre una promozione se accetti di fare una cosa eticamente discutibile.',
-   leftChoice: {text:'Accetti',                id:+7,  ego:-7,  superego:-13, log:"Hai venduto un principio. Il SUPER-IO si incrina.",  defense:'razionalizzazione'},
-   rightChoice:{text:'Rifiuti',                id:-6,  ego:+8,  superego:+13, log:"Hai scelto l'integrita.",                           defense:null}},
-  {id:'p003',phase:2,tags:['love'],speaker:'Il tuo partner',
-   text:'Ti chiede un impegno serio. Senti il desiderio di liberta confliggere con l amore.',
-   leftChoice: {text:'Scappi',                 id:+9,  ego:-8,  superego:-7,  log:"Hai evitato il legame. L'ES cerca liberta.",        defense:null},
-   rightChoice:{text:'Rimani',                 id:-6,  ego:+9,  superego:+8,  log:"Hai scelto la responsabilita.",                     defense:'identificazione'}},
-  {id:'p004',phase:2,tags:['art'],speaker:'Il tuo sogno',
-   text:'Puoi abbandonare un lavoro sicuro per seguire la tua passione artistica.',
-   leftChoice: {text:'Segui la passione',      id:+8,  ego:+6,  superego:-9,  log:"Hai ascoltato il desiderio creativo.",               defense:'sublimazione'},
-   rightChoice:{text:'Resti al lavoro',        id:-7,  ego:+4,  superego:+10, log:"La sicurezza prevale. Il dovere domina.",            defense:null}},
-  {id:'p005',phase:2,tags:['risk'],speaker:'Un amico',
-   text:'In un momento di crisi ti offre qualcosa per stare meglio — una sostanza.',
-   leftChoice: {text:'Accetti',                id:+13, ego:-10, superego:-11, mortal:false, log:"Hai cercato sollievo. Rischio dipendenza.", defense:'negazione'},
-   rightChoice:{text:'Rifiuti',                id:-5,  ego:+8,  superego:+8,  log:"Hai resistito. L'IO ha retto.",                      defense:null}},
-  {id:'p006',phase:2,tags:['anger'],speaker:'La tua rabbia',
-   text:'Un amico ti tradisce in modo grave. Potresti vendicarti o perdonare.',
-   leftChoice: {text:'Ti vendichi',            id:+11, ego:-7,  superego:-11, log:"La vendetta ha soddisfatto l'ES ma leso l'anima.",   defense:'spostamento'},
-   rightChoice:{text:'Perdoni',                id:-6,  ego:+9,  superego:+10, log:"Il perdono ha rafforzato l'IO.",                     defense:'altruismo'}},
-  {id:'p007',phase:2,tags:['grief'],speaker:'La morte',
-   text:'Perdi un genitore. Il dolore e insopportabile. Come lo affronti?',
-   leftChoice: {text:'Ti chiudi completamente', id:-4, ego:-11, superego:+5,  log:"Il lutto si trasforma in isolamento.",               defense:'intellettualizzazione'},
-   rightChoice:{text:'Piangi, cerchi sostegno', id:+3, ego:+10, superego:+3,  log:"Il lutto viene elaborato. L'IO resiste.",            defense:null}},
-  {id:'p008',phase:2,tags:['health'],speaker:'Il tuo corpo',
-   text:'Ignori segnali fisici di malessere per mesi pur di non interrompere il lavoro.',
-   leftChoice: {text:'Continui ad ignorare',   id:+4,  ego:-8,  superego:-5,  mortal:false, log:"Stai mettendo a rischio la salute.",  defense:'negazione'},
-   rightChoice:{text:'Vai dal medico',         id:-3,  ego:+10, superego:+7,  log:"Cura di te. L'IO si prende responsabilita.",         defense:null}},
-  {id:'p009',phase:2,tags:['identity'],speaker:'La piazza',
-   text:'Sei coinvolto in una causa. Ti chiedono azioni illegali per la causa.',
-   leftChoice: {text:'Partecipi',              id:+8,  ego:-8,  superego:-8,  mortal:false, log:"Hai messo l'ideale sopra la legge.",  defense:null},
-   rightChoice:{text:'Rimani nei limiti',      id:-5,  ego:+9,  superego:+8,  log:"Hai tenuto il confine. L'IO media.",                 defense:'razionalizzazione'}},
-
-  // ETA ADULTA (fase 3)
-  {id:'e001',phase:3,tags:['family'],speaker:'Tuo figlio',
-   text:'Tuo figlio adolescente ti confida qualcosa che ti spaventa. Reagisci con controllo o ascolto?',
-   leftChoice: {text:'Controlli e giudichi',   id:-4,  ego:-7,  superego:+12, log:"Il SUPER-IO ha parlato al posto dell'IO.",           defense:null},
-   rightChoice:{text:'Ascolti senza giudicare',id:+2,  ego:+12, superego:+3,  log:"L'IO maturo ha mediato. Profondo equilibrio.",       defense:null}},
-  {id:'e002',phase:3,tags:['work'],speaker:'Un collega',
-   text:'Scopri che un collega ruba sistematicamente all azienda. Lo denunci?',
-   leftChoice: {text:'Guardi dall altra parte', id:+6, ego:-8,  superego:-13, log:"Complice per quieto vivere. Il SUPER-IO e lesato.",   defense:'negazione'},
-   rightChoice:{text:'Denunci',                id:-7,  ego:+7,  superego:+13, log:"Integrita morale mantenuta.",                        defense:null}},
-  {id:'e003',phase:3,tags:['relationship'],speaker:'Il tradimento',
-   text:'Il tuo partner ti tradisce. Perdoni o rompi definitivamente?',
-   leftChoice: {text:'Perdoni e reprimi',      id:-5,  ego:-9,  superego:+7,  log:"Rimozione del dolore. L'IO si incrina.",             defense:'rimozione'},
-   rightChoice:{text:'Rompi e vai avanti',     id:+3,  ego:+11, superego:+4,  log:"L'IO ha scelto la dignita.",                        defense:null}},
-  {id:'e004',phase:3,tags:['meaning'],speaker:'Lo specchio a 50',
-   text:'Senti il vuoto della mezza eta. Ricominciare da zero o trovare senso in cio che hai?',
-   leftChoice: {text:'Ricominciare tutto',     id:+10, ego:-6,  superego:-8,  log:"Fuga dal presente. L'ES cerca rinascita.",           defense:'regressione'},
-   rightChoice:{text:'Integri passato e futuro',id:-4, ego:+12, superego:+7,  log:"Integrazione psichica matura.",                     defense:'sublimazione'}},
-  {id:'e005',phase:3,tags:['health'],speaker:'Il tuo medico',
-   text:'Ti diagnosticano una condizione cronica. Come la vivi?',
-   leftChoice: {text:'Neghi e ignori la terapia',id:+4,ego:-12, superego:-4,  mortal:true, log:"Negazione pericolosa. L'IO abdica.",    defense:'negazione'},
-   rightChoice:{text:'Affronti con realismo',  id:-3,  ego:+10, superego:+5,  log:"L'IO ha accettato la realta.",                      defense:'razionalizzazione'}},
-  {id:'e006',phase:3,tags:['power'],speaker:'Il potere',
-   text:'Ti viene offerta una posizione di grande potere che richiede compromessi morali continui.',
-   leftChoice: {text:'Accetti il potere',      id:+9,  ego:-6,  superego:-14, log:"Il potere logora lentamente l'anima.",               defense:'razionalizzazione'},
-   rightChoice:{text:'Declini',                id:-7,  ego:+8,  superego:+13, log:"Hai preservato l'integrita.",                       defense:null}},
-  {id:'e007',phase:3,tags:['help'],speaker:'Un estraneo',
-   text:'Vedi qualcuno in difficolta in strada. Hai molta fretta. Ti fermi?',
-   leftChoice: {text:'Passi oltre',            id:+5,  ego:-5,  superego:-10, log:"L'egoismo ha prevalso.",                            defense:null},
-   rightChoice:{text:'Ti fermi ad aiutare',    id:-4,  ego:+6,  superego:+11, log:"Altruismo genuino.",                                defense:'altruismo'}},
-  {id:'e008',phase:3,tags:['grief'],speaker:'La vecchiaia',
-   text:'Un vecchio amico muore. Il tuo primo pensiero e la tua stessa mortalita.',
-   leftChoice: {text:'Ti getti nel lavoro',    id:+4,  ego:-8,  superego:+4,  log:"Il lavoro come fuga dalla morte.",                  defense:'intellettualizzazione'},
-   rightChoice:{text:'Elabori il lutto',       id:-2,  ego:+10, superego:+5,  log:"Accettazione della mortalita. L'IO si approfondisce.", defense:null}},
-
-  // VECCHIAIA (fase 4)
-  {id:'v001',phase:4,tags:['meaning'],speaker:'I tuoi anni',
-   text:'Guardi indietro alla tua vita. Senti rimpianto per le strade non percorse.',
-   leftChoice: {text:'Il rimpianto ti consuma', id:-5, ego:-12, superego:+8,  log:"Il rimpianto divora. L'IO cede.",                   defense:null},
-   rightChoice:{text:'Accetti la tua storia',  id:+2,  ego:+12, superego:+5,  log:"Integrazione di vita. L'IO si completa.",           defense:'umorismo'}},
-  {id:'v002',phase:4,tags:['family'],speaker:'Un nipote',
-   text:'Tuo nipote ti chiede di parlargli onestamente degli errori che hai fatto.',
-   leftChoice: {text:'Menti per sembrare perfetto',id:+5,ego:-10,superego:-8, log:"Hai mantenuto la maschera. L'IO si distorce.",       defense:'negazione'},
-   rightChoice:{text:'Racconti la verita',     id:-3,  ego:+12, superego:+9,  log:"Onesta con la propria storia.",                     defense:null}},
-  {id:'v003',phase:4,tags:['death'],speaker:'Il silenzio',
-   text:'Pensi spesso alla morte. La cerchi di capire o la fuggi?',
-   leftChoice: {text:'La fuggi con ogni mezzo', id:+7, ego:-10, superego:-5,  log:"La fuga dalla morte logora l'IO.",                  defense:'negazione'},
-   rightChoice:{text:'La accetti come parte della vita',id:-3,ego:+12,superego:+7,log:"Saggezza tardiva. L'IO si completa.",            defense:'intellettualizzazione'}},
-  {id:'v004',phase:4,tags:['legacy'],speaker:'Le tue mani',
-   text:'Hai qualcosa di prezioso da lasciare. Lo doni a chi ne ha bisogno o ai tuoi familiari?',
-   leftChoice: {text:'Tienilo per i tuoi',     id:+4,  ego:-4,  superego:+5,  log:"Affetto familiare. Una scelta legittima.",           defense:null},
-   rightChoice:{text:'Lo doni a uno sconosciuto',id:-3,ego:+8,  superego:+10, log:"Generosita universale. Il SUPER-IO si eleva.",      defense:'altruismo'}},
-  {id:'v005',phase:4,tags:['health'],speaker:'Il medico',
-   text:'Ti propongono una terapia aggressiva che potrebbe prolungare la vita di qualche settimana.',
-   leftChoice: {text:'Accetti ogni terapia',   id:-4,  ego:-5,  superego:+7,  log:"La lotta alla morte a ogni costo affanna l'IO.",    defense:null},
-   rightChoice:{text:'Scegli la qualita di vita',id:+2,ego:+12, superego:+5,  log:"Saggezza e accettazione. L'IO in pace.",            defense:null}},
-  {id:'v006',phase:4,tags:['reconciliation'],speaker:'Un vecchio rancore',
-   text:'C e qualcuno con cui hai rotto da anni. Potresti cercare riconciliazione prima che sia tardi.',
-   leftChoice: {text:'Lasci perdere',          id:+3,  ego:-8,  superego:-7,  log:"Il risentimento chiude la porta.",                  defense:'proiezione'},
-   rightChoice:{text:'Cerchi riconciliazione', id:-2,  ego:+11, superego:+9,  log:"La guarigione arriva tardi ma arriva.",              defense:null}},
-  {id:'v007',phase:4,tags:['peace'],speaker:'La pace interiore',
-   text:'In silenzio, la notte, senti che la tua vita ha avuto un senso.',
-   leftChoice: {text:'Dubiti di tutto',        id:+3,  ego:-13, superego:+5,  log:"Il dubbio tardivo corrode l'IO.",                   defense:null},
-   rightChoice:{text:'Ti lasci cullare',       id:-2,  ego:+13, superego:+5,  log:"La serenita dell'IO integrato. Una fine degna.",    defense:'umorismo'}},
-];
-
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-let state = {};
-let currentCard = null;
-let isDragging = false;
-
-function freshState() {
-  return {
-    id:33, ego:34, superego:33,
-    age:6, phase:0,
-    defenses:[], pathologies:[],
-    cardsUsed: new Set(),
-    phaseCardsPlayed:0, totalCardsPlayed:0,
-    idModifier:0, sublimazione:false,
-    projezione:false, proiezione_used:false,
-    negazione:false, negazione_used:false,
-    spostamento:false, umorismo:false, umorismo_used:false,
-    regressionePenalty:false, narcisismoActive:false,
-    gameOver:false,
-  };
+const CARDS={
+0:[
+{title:"La coperta di Linus",desc:"Hai un oggetto a cui sei molto attaccato. Tua madre vuole che tu smetta di portarlo ovunque.",l:{text:"Ubbidisci",es:-1,io:0,superio:1},r:{text:"Tienila stretta",es:1,io:0,superio:-1}},
+{title:"Il bullo del parco",desc:"Un bambino più grande ti prende i giochi. Ti senti impotente e arrabbiato.",l:{text:"Piangi e cerchi mamma",es:-1,io:-1,superio:1},r:{text:"Lo spingi via",es:2,io:1,superio:-1}},
+{title:"La prima bugia",desc:"Hai rotto un vaso. I tuoi genitori ti chiedono cosa è successo.",l:{text:"Dici la verità",es:-1,io:1,superio:2},r:{text:"Menti",es:1,io:1,superio:-1}},
+{title:"L'amico immaginario",desc:"Passi ore a parlare con un amico che nessuno può vedere. I tuoi sono preoccupati.",l:{text:"Lo abbandoni",es:-1,io:0,superio:1},r:{text:"Continui a giocarci",es:1,io:-1,superio:0}},
+{title:"Paura del buio",desc:"Non riesci a dormire senza luce. Tuo padre dice che devi essere coraggioso.",l:{text:"Dormi al buio",es:-1,io:2,superio:1},r:{text:"Piangi per la luce",es:1,io:-1,superio:0}},
+{title:"Il dolce proibito",desc:"Mamma ha detto niente cioccolata prima di cena. Ma è lì, sul tavolo, incustodita.",l:{text:"Resisti",es:-2,io:1,superio:2},r:{text:"La mangi di nascosto",es:2,io:0,superio:-1}},
+{title:"Il disegno rifiutato",desc:"Hai fatto un disegno per la maestra, ma lei lo ha messo da parte senza guardarlo.",l:{text:"Ne fai uno migliore",es:0,io:2,superio:0},r:{text:"Strappi il foglio",es:2,io:-1,superio:-1}},
+{title:"La punizione",desc:"Hai fatto un dispetto e vieni messo in castigo. Ti sembra ingiusto.",l:{text:"Accetti la punizione",es:-2,io:0,superio:2},r:{text:"Fai i capricci",es:2,io:-1,superio:-1}},
+{title:"Il giocattolo conteso",desc:"Un altro bambino ha il giocattolo che vuoi tu. Potresti prenderglielo.",l:{text:"Aspetti il tuo turno",es:-1,io:1,superio:2},r:{text:"Glielo strappi",es:2,io:0,superio:-2}},
+{title:"La ninna nanna",desc:"Sei stanco ma non vuoi andare a dormire. Il mondo è troppo interessante.",l:{text:"Vai a letto",es:-1,io:1,superio:1},r:{text:"Resisti con tutte le forze",es:1,io:-1,superio:0}},
+{title:"Il fratellino nuovo",desc:"Mamma e papà portano a casa un neonato. Tutti gli danno attenzione.",l:{text:"Cerchi di essere d'aiuto",es:-1,io:1,superio:2},r:{text:"Sei geloso e lo dimostri",es:2,io:0,superio:-1}},
+{title:"Le parolacce",desc:"Hai sentito una parolaccia e l'hai ripetuta. Gli adulti sono scioccati.",l:{text:"Chiedi scusa",es:-1,io:0,superio:2},r:{text:"La ripeti ridendo",es:2,io:0,superio:-2}},
+{title:"Il piatto che non piace",desc:"Devi mangiare le verdure. Le odi, ma tua madre insiste.",l:{text:"Le mangi controvoglia",es:-2,io:1,superio:2},r:{text:"Le nascondi nel tovagliolo",es:1,io:1,superio:-1}},
+{title:"L'incubo ricorrente",desc:"Sogni un mostro ogni notte. Hai paura di addormentarti.",l:{text:"Ne parli con mamma",es:-1,io:2,superio:0},r:{text:"Lo tieni per te",es:0,io:-1,superio:1}},
+],
+1:[
+{title:"La prima cotta",desc:"Senti qualcosa di nuovo per un compagno di classe. Il cuore batte forte quando lo/la vedi.",l:{text:"Reprimi i sentimenti",es:-2,io:0,superio:2},r:{text:"Ti dichiari",es:2,io:1,superio:-1}},
+{title:"La sigaretta",desc:"I tuoi amici fumano dietro la scuola e ti offrono una sigaretta.",l:{text:"Rifiuti",es:-1,io:1,superio:2},r:{text:"Accetti",es:2,io:0,superio:-1}},
+{title:"L'esame importante",desc:"Domani c'è un esame decisivo. Hai la possibilità di copiare senza rischi.",l:{text:"Studi tutta la notte",es:-2,io:2,superio:2},r:{text:"Copi",es:1,io:0,superio:-2}},
+{title:"Il litigio con i genitori",desc:"I tuoi ti proibiscono di uscire. Senti che non capiscono niente di te.",l:{text:"Accetti la regola",es:-2,io:0,superio:2},r:{text:"Esci di nascosto",es:2,io:1,superio:-2}},
+{title:"Il gruppo sbagliato",desc:"I ragazzi più 'cool' ti invitano a fare qualcosa di rischioso per dimostrare che sei dei loro.",l:{text:"Rifiuti e te ne vai",es:-1,io:2,superio:1},r:{text:"Li segui",es:2,io:-1,superio:-1}},
+{title:"Il diario segreto",desc:"Scopri che qualcuno ha letto il tuo diario. Sei furioso e vulnerabile.",l:{text:"Ne parli con calma",es:-1,io:2,superio:1},r:{text:"Fai una scenata",es:2,io:-1,superio:0}},
+{title:"L'alcol alla festa",desc:"Alla prima festa senza genitori, c'è alcol ovunque. Tutti bevono.",l:{text:"Bevi solo acqua",es:-2,io:1,superio:2},r:{text:"Bevi per stare nel gruppo",es:2,io:-1,superio:-1}},
+{title:"Il confronto con il corpo",desc:"Ti guardi allo specchio e non ti piaci. I social mostrano corpi perfetti.",l:{text:"Accetti il tuo corpo",es:0,io:2,superio:0},r:{text:"Inizi una dieta estrema",es:-1,io:-1,superio:2}},
+{title:"La prima relazione seria",desc:"Qualcuno vuole stare con te. È eccitante ma anche spaventoso.",l:{text:"Mantieni le distanze",es:-2,io:1,superio:1},r:{text:"Ti butti a capofitto",es:2,io:0,superio:-1}},
+{title:"Il tradimento dell'amico",desc:"Il tuo migliore amico ha rivelato un tuo segreto a tutti.",l:{text:"Lo perdoni",es:-1,io:1,superio:2},r:{text:"Ti vendichi",es:2,io:0,superio:-2}},
+{title:"La vocazione",desc:"Senti una passione forte per qualcosa: arte, musica, scienza. Ma nessuno ti prende sul serio.",l:{text:"La coltivi in segreto",es:0,io:2,superio:0},r:{text:"La abbandoni per conformarti",es:-1,io:-1,superio:1}},
+{title:"Sesso e curiosità",desc:"L'occasione si presenta. Senti desiderio ma anche confusione e forse paura.",l:{text:"Aspetti",es:-2,io:1,superio:2},r:{text:"Ti lasci andare",es:2,io:0,superio:-2}},
+{title:"La competizione scolastica",desc:"Puoi vincere una borsa di studio, ma dovresti sabotare un compagno.",l:{text:"Competi lealmente",es:-1,io:2,superio:2},r:{text:"Saboti l'altro",es:1,io:0,superio:-2}},
+{title:"Il lutto del nonno",desc:"Tuo nonno è morto. È la prima volta che affronti la morte di qualcuno vicino.",l:{text:"Piangi apertamente",es:0,io:1,superio:0},r:{text:"Fai finta di niente",es:-1,io:-1,superio:1}},
+],
+2:[
+{title:"Il primo lavoro",desc:"Hai un'offerta di lavoro stabile ma noiosa, oppure puoi inseguire il tuo sogno senza sicurezze.",l:{text:"Lavoro stabile",es:-2,io:1,superio:2},r:{text:"Insegui il sogno",es:2,io:1,superio:-1}},
+{title:"Convivenza",desc:"Il/la tuo/a partner vuole andare a vivere insieme. È un passo enorme.",l:{text:"Non sei pronto/a",es:0,io:1,superio:0},r:{text:"Accetti",es:1,io:1,superio:1}},
+{title:"Una notte di eccessi",desc:"Una serata fuori controllo: alcol, persone sconosciute, decisioni impulsive.",l:{text:"Vai a casa presto",es:-2,io:1,superio:2},r:{text:"Ti lasci andare",es:3,io:-1,superio:-2}},
+{title:"Il compromesso morale",desc:"Il tuo capo ti chiede di mentire a un cliente per chiudere un affare importante.",l:{text:"Rifiuti",es:-1,io:2,superio:2},r:{text:"Menti",es:1,io:0,superio:-2}},
+{title:"La proposta di matrimonio",desc:"Qualcuno ti chiede di sposarti. Lo ami, ma il matrimonio ti spaventa.",l:{text:"Dici di no",es:1,io:1,superio:-1},r:{text:"Accetti",es:-1,io:1,superio:2}},
+{title:"Il tradimento",desc:"Sei attratto/a da un'altra persona. Il tuo partner non saprebbe mai nulla.",l:{text:"Resisti alla tentazione",es:-2,io:2,superio:2},r:{text:"Cedi",es:3,io:-1,superio:-2}},
+{title:"L'investimento rischioso",desc:"Un amico ti propone un investimento che sembra troppo bello per essere vero.",l:{text:"Declini",es:-1,io:2,superio:1},r:{text:"Investi tutto",es:2,io:-1,superio:0}},
+{title:"Il figlio",desc:"Arriva la possibilità di diventare genitore. Cambia tutto.",l:{text:"Non ora",es:1,io:1,superio:-1},r:{text:"Diventi genitore",es:-1,io:1,superio:2}},
+{title:"La crisi d'identità",desc:"Non sai più chi sei o cosa vuoi. Tutto sembra sbagliato.",l:{text:"Cerchi aiuto professionale",es:0,io:2,superio:0},r:{text:"Ti anestetizzi con piaceri",es:2,io:-1,superio:-1}},
+{title:"Il prestito all'amico",desc:"Un amico in difficoltà ti chiede molti soldi. Non è sicuro che li restituirà.",l:{text:"Rifiuti gentilmente",es:0,io:1,superio:0},r:{text:"Gli dai tutto",es:-1,io:0,superio:2}},
+{title:"La sostanza",desc:"A una festa ti offrono qualcosa di più forte dell'alcol. 'Una volta sola, non succede niente.'",l:{text:"Rifiuti fermamente",es:-1,io:2,superio:1},r:{text:"Provi",es:3,io:-2,superio:-1}},
+{title:"La denuncia",desc:"Sei testimone di un'ingiustizia sul lavoro. Denunciare potrebbe costarti il posto.",l:{text:"Denunci",es:-1,io:2,superio:2},r:{text:"Fai finta di niente",es:0,io:-1,superio:-1}},
+{title:"La rinuncia al sogno",desc:"Il tuo sogno non sta funzionando. Hai speso anni e energie.",l:{text:"Lasci perdere",es:-1,io:0,superio:1},r:{text:"Insisti ancora",es:1,io:1,superio:0}},
+{title:"La relazione tossica",desc:"Sai che questa relazione ti fa male, ma lasciar andare sembra impossibile.",l:{text:"La chiudi",es:-1,io:2,superio:1},r:{text:"Resti",es:1,io:-2,superio:0}},
+],
+3:[
+{title:"La routine che soffoca",desc:"Ogni giorno è uguale. Lavoro, casa, TV, sonno. Senti che stai scomparendo.",l:{text:"Cambi qualcosa",es:1,io:2,superio:0},r:{text:"Accetti la routine",es:-1,io:-1,superio:1}},
+{title:"Il conflitto generazionale",desc:"Tuo figlio adolescente si ribella. Vedi in lui i tuoi stessi errori.",l:{text:"Sei comprensivo",es:0,io:2,superio:0},r:{text:"Imponi disciplina severa",es:-1,io:0,superio:2}},
+{title:"L'offerta dall'estero",desc:"Un lavoro incredibile in un altro paese. Ma significherebbe lasciare tutto.",l:{text:"Resti",es:-1,io:0,superio:1},r:{text:"Parti",es:2,io:1,superio:-1}},
+{title:"La malattia di un genitore",desc:"Tua madre è gravemente malata. Deve essere accudita, ma la tua vita è altrove.",l:{text:"Ti dedichi a lei",es:-2,io:1,superio:2},r:{text:"Paghi qualcuno",es:0,io:-1,superio:-1}},
+{title:"Il fallimento",desc:"Il tuo progetto di vita è fallito. Anni di lavoro, persi. Devi ricominciare.",l:{text:"Accetti e riparti",es:0,io:2,superio:0},r:{text:"Ti chiudi in te stesso",es:-1,io:-2,superio:0}},
+{title:"La tentazione del potere",desc:"Ti offrono una posizione di potere, ma a costo di compromessi etici profondi.",l:{text:"Rifiuti",es:-1,io:2,superio:2},r:{text:"Accetti",es:2,io:0,superio:-2}},
+{title:"L'avventura extraconiugale",desc:"Dopo anni di matrimonio, l'attrazione per un'altra persona è fortissima.",l:{text:"Resisti",es:-2,io:1,superio:2},r:{text:"Cedi alla passione",es:3,io:-1,superio:-2}},
+{title:"Il divorzio",desc:"Il matrimonio è finito. Restare è ipocrita, andare è doloroso per tutti.",l:{text:"Provi ancora",es:-1,io:0,superio:1},r:{text:"Divorzi",es:1,io:1,superio:-1}},
+{title:"La crisi di mezza età",desc:"Guardi la tua vita e non la riconosci. Dove sono finiti i tuoi sogni?",l:{text:"Accetti chi sei",es:-1,io:2,superio:1},r:{text:"Rivoluzioni tutto",es:2,io:0,superio:-1}},
+{title:"L'eredità contesa",desc:"Un parente è morto lasciando un'eredità. La famiglia si sta dilaniando.",l:{text:"Rinunci alla tua parte",es:-2,io:1,superio:2},r:{text:"Lotti per il tuo",es:2,io:0,superio:-1}},
+{title:"Il perdono impossibile",desc:"Qualcuno ti ha fatto molto male in passato. Ti chiede perdono.",l:{text:"Perdoni",es:-1,io:2,superio:1},r:{text:"Rifiuti",es:1,io:0,superio:0}},
+{title:"La dipendenza che cresce",desc:"Un'abitudine sta diventando dipendenza. Qualcosa ti sta consumando.",l:{text:"Cerchi aiuto",es:-2,io:2,superio:1},r:{text:"Neghi il problema",es:2,io:-2,superio:-1}},
+{title:"Il figlio che se ne va",desc:"Tuo figlio lascia casa. Il nido è vuoto. Ti senti inutile.",l:{text:"Lo lasci andare con amore",es:-1,io:2,superio:1},r:{text:"Cerchi di trattenerlo",es:1,io:-1,superio:0}},
+{title:"La morte dell'amico",desc:"Il tuo amico più caro muore improvvisamente. Il mondo sembra fragile.",l:{text:"Elabori il lutto",es:0,io:1,superio:0},r:{text:"Ti anestetizzi",es:1,io:-2,superio:0}},
+],
+4:[
+{title:"Il pensionamento",desc:"Non lavori più. Il tempo è tanto, il senso di utilità è poco.",l:{text:"Trovi nuovi interessi",es:0,io:2,superio:0},r:{text:"Ti lasci andare",es:0,io:-2,superio:0}},
+{title:"I ricordi che sbiadiscono",desc:"La memoria non è più quella di una volta. A volte non riconosci i luoghi.",l:{text:"Accetti con serenità",es:0,io:1,superio:0},r:{text:"Ti arrabbi con te stesso",es:0,io:-1,superio:1}},
+{title:"Il nipotino",desc:"Tuo nipote ti chiede di raccontargli la tua vita. Cosa gli dici?",l:{text:"Racconti la verità",es:0,io:2,superio:1},r:{text:"Abbellisci tutto",es:1,io:0,superio:0}},
+{title:"La casa di riposo",desc:"I tuoi figli suggeriscono una casa di riposo. Dicono che è per il tuo bene.",l:{text:"Accetti",es:-2,io:0,superio:2},r:{text:"Rifiuti fermamente",es:1,io:1,superio:-1}},
+{title:"L'ultimo amore",desc:"Alla tua età, incontri qualcuno che ti fa battere il cuore. La gente giudica.",l:{text:"Lo vivi",es:2,io:1,superio:-1},r:{text:"Rinunci",es:-2,io:-1,superio:2}},
+{title:"Il testamento",desc:"Devi decidere come dividere i tuoi beni. Ogni scelta porterà conflitti.",l:{text:"Dividi equamente",es:-1,io:1,superio:2},r:{text:"Favorisci chi preferisci",es:1,io:0,superio:-1}},
+{title:"La fede perduta",desc:"Le certezze vacillano. C'è qualcosa dopo? O è tutto qui?",l:{text:"Trovi pace nell'incertezza",es:0,io:2,superio:0},r:{text:"Ti aggrappi alla fede",es:-1,io:0,superio:2}},
+{title:"La confessione tardiva",desc:"Hai un segreto che porti da decenni. Dirlo libererebbe la coscienza ma ferirebbe qualcuno.",l:{text:"Lo confessi",es:0,io:2,superio:1},r:{text:"Lo porti con te",es:0,io:-1,superio:0}},
+{title:"Il corpo che cede",desc:"Non puoi più fare le cose di prima. Dipendi dagli altri per le cose semplici.",l:{text:"Accetti aiuto con grazia",es:-1,io:1,superio:1},r:{text:"Ti ostini a fare da solo",es:1,io:0,superio:-1}},
+{title:"L'amico d'infanzia",desc:"Rincontri qualcuno che non vedevi da 60 anni. I ricordi travolgono entrambi.",l:{text:"Lo abbracci",es:1,io:2,superio:0},r:{text:"Fingi di non riconoscerlo",es:-1,io:-1,superio:0}},
+{title:"La revisione della vita",desc:"Ripercorri tutto: errori, gioie, rimpianti. La vita ha avuto senso?",l:{text:"Sì, ne è valsa la pena",es:0,io:2,superio:1},r:{text:"Troppi rimpianti",es:0,io:-2,superio:0}},
+{title:"La rinuncia finale",desc:"Senti che il tempo sta finendo. Puoi lasciar andare in pace, o aggrapparti.",l:{text:"Lasci andare",es:-1,io:2,superio:1},r:{text:"Ti aggrappi",es:1,io:-1,superio:0}},
+]};
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function getPhase(age){if(age<13)return 0;if(age<25)return 1;if(age<45)return 2;if(age<70)return 3;return 4}
+function updateStats(){
+  document.getElementById('bar-es').style.width=(G.es*10)+'%';
+  document.getElementById('bar-io').style.width=(G.io*10)+'%';
+  document.getElementById('bar-superio').style.width=(G.superio*10)+'%';
+  document.getElementById('val-es').textContent=G.es;
+  document.getElementById('val-io').textContent=G.io;
+  document.getElementById('val-superio').textContent=G.superio;
+  document.getElementById('age-display').textContent='Età: '+G.age;
+  document.getElementById('phase-label').textContent=PHASES[G.phase];
 }
-
-function startGame() {
-  document.getElementById('intro').style.display = 'none';
-  state = freshState();
-  drawCard();
-  updateUI();
-  setupDrag();
+function renderBadges(){
+  const bb=document.getElementById('bottom-bar');bb.innerHTML='';
+  G.defenses.forEach(d=>{const b=document.createElement('div');b.className='badge defense';b.textContent=DEFENSES[d].name;b.onclick=()=>showModal('defense',d);bb.appendChild(b)});
+  G.psychos.forEach(p=>{const b=document.createElement('div');b.className='badge psycho';b.textContent=PSYCHOS[p].name;b.onclick=()=>showModal('psycho',p);bb.appendChild(b)});
 }
-
-function resetGame() {
-  document.getElementById('overlay').classList.remove('active');
-  document.getElementById('event-log').innerHTML = '';
-  state = freshState();
-  currentCard = null;
-  drawCard();
-  updateUI();
+function showNotif(text,type,dur=2500){const n=document.getElementById('notif');n.textContent=text;n.className='notif '+type+' show';setTimeout(()=>n.classList.remove('show'),dur)}
+function showModal(type,key){
+  const data=type==='defense'?DEFENSES[key]:PSYCHOS[key];
+  const ol=document.createElement('div');ol.className='overlay';
+  ol.innerHTML=`<div class="modal"><h2>${data.name}</h2><p>${data.desc}</p><h3>Effetto in gioco</h3><p class="effect ${type==='psycho'?'neg-effect':''}">${data.effect}</p><button class="modal-close" onclick="this.closest('.overlay').remove()">Chiudi</button></div>`;
+  document.body.appendChild(ol);
 }
-
-// ═══════════════════════════════════════════════════════
-// CARDS
-// ═══════════════════════════════════════════════════════
-function getAvailableCards() {
-  return CARDS.filter(c => c.phase === state.phase && !state.cardsUsed.has(c.id));
+let deck=[];let currentCard=null;
+function buildDeck(){deck=[];for(let p=G.phase;p<=4;p++)deck=deck.concat(shuffle(CARDS[p]))}
+function drawCard(){
+  if(!G.alive)return;
+  let np=getPhase(G.age);if(np!==G.phase){G.phase=np;buildDeck()}
+  let pc=deck.filter(c=>CARDS[G.phase].includes(c));
+  if(pc.length===0){deck=deck.concat(shuffle(CARDS[G.phase]));pc=deck.filter(c=>CARDS[G.phase].includes(c))}
+  currentCard=pc[0];deck=deck.filter(c=>c!==currentCard);renderCard(currentCard);
 }
-
-function drawCard() {
-  let avail = getAvailableCards();
-  if (avail.length === 0) {
-    if (state.phase < 4) {
-      state.phase++;
-      state.phaseCardsPlayed = 0;
-      avail = getAvailableCards();
-      if (avail.length === 0) { triggerDeath('naturale'); return; }
-    } else { triggerDeath('naturale'); return; }
-  }
-  const ph = PHASES[state.phase];
-  const total = CARDS.filter(c => c.phase === state.phase).length;
-  state.age = Math.min(ph.ageEnd, Math.round(ph.ageStart + (state.phaseCardsPlayed / total) * (ph.ageEnd - ph.ageStart)));
-
-  currentCard = avail[Math.floor(Math.random() * avail.length)];
-  state.cardsUsed.add(currentCard.id);
-
-  const card = document.getElementById('card');
-  card.style.cssText = 'transition:none;transform:none;opacity:1;';
-  card.classList.remove('appear');
-  void card.offsetWidth;
-  card.classList.add('appear');
-
-  document.getElementById('card-speaker').textContent = currentCard.speaker;
-  document.getElementById('card-text').textContent = currentCard.text;
-  document.getElementById('card-hint').classList.remove('visible');
-  hideChoicePreviews();
-  updateChoicePreview('left', currentCard.leftChoice);
-  updateChoicePreview('right', currentCard.rightChoice);
-  setTimeout(() => { const h=document.getElementById('card-hint'); if(h) h.classList.add('visible'); }, 1400);
-  updateUI();
+function renderCard(c){
+  const area=document.getElementById('card-area');area.querySelectorAll('.card').forEach(e=>e.remove());
+  const el=document.createElement('div');el.className='card';
+  el.innerHTML=`<div class="card-phase">${PHASES[G.phase]} — ${G.age} anni</div><div class="card-title">${c.title}</div><div class="card-desc">${c.desc}</div><div class="card-divider">— &#10022; —</div><div class="card-choices"><button class="choice-btn left" data-dir="left">${c.l.text}</button><button class="choice-btn right" data-dir="right">${c.r.text}</button></div><div class="card-preview left" id="preview-left">&#9666; ${c.l.text}</div><div class="card-preview right" id="preview-right">${c.r.text} &#9656;</div>`;
+  area.appendChild(el);setupCardInteraction(el,c);
 }
-
-function hideChoicePreviews() {
-  document.getElementById('preview-left').classList.remove('show-left');
-  document.getElementById('preview-right').classList.remove('show-right');
+function setupCardInteraction(el,card){
+  let startX=0,dx=0,dragging=false;const threshold=80;
+  function onStart(e){dragging=true;startX=e.touches?e.touches[0].clientX:e.clientX;el.classList.add('dragging')}
+  function onMove(e){if(!dragging)return;const cx=e.touches?e.touches[0].clientX:e.clientX;dx=cx-startX;
+    el.style.transform=`translateX(${dx}px) rotate(${dx*0.04}deg)`;
+    const pl=el.querySelector('.card-preview.left'),pr=el.querySelector('.card-preview.right');
+    const hl=document.getElementById('hint-left'),hr=document.getElementById('hint-right');
+    if(dx<-30){pl.classList.add('show');pr.classList.remove('show');hl.style.opacity='0.6';hr.style.opacity='0'}
+    else if(dx>30){pr.classList.add('show');pl.classList.remove('show');hr.style.opacity='0.6';hl.style.opacity='0'}
+    else{pl.classList.remove('show');pr.classList.remove('show');hl.style.opacity='0';hr.style.opacity='0'}}
+  function onEnd(){if(!dragging)return;dragging=false;el.classList.remove('dragging');
+    document.getElementById('hint-left').style.opacity='0';document.getElementById('hint-right').style.opacity='0';
+    if(dx<-threshold)choose('left',card,el);else if(dx>threshold)choose('right',card,el);
+    else{el.style.transform='';el.querySelector('.card-preview.left').classList.remove('show');el.querySelector('.card-preview.right').classList.remove('show')}dx=0}
+  el.addEventListener('mousedown',onStart);el.addEventListener('touchstart',onStart,{passive:true});
+  document.addEventListener('mousemove',onMove);document.addEventListener('touchmove',onMove,{passive:true});
+  document.addEventListener('mouseup',onEnd);document.addEventListener('touchend',onEnd);
+  el.querySelectorAll('.choice-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();choose(btn.dataset.dir,card,el)})});
 }
-
-function updateChoicePreview(side, choice) {
-  document.getElementById('preview-'+side+'-text').textContent = choice.text;
-  const fxEl = document.getElementById('preview-'+side+'-fx');
-  let pills = '';
-  if (choice.id)       pills += '<span class="effect-pill '+(choice.id>0?'up-id':'down-id')+'">ES '+(choice.id>0?'+':'')+choice.id+'</span>';
-  if (choice.ego)      pills += '<span class="effect-pill '+(choice.ego>0?'up-ego':'down-ego')+'">IO '+(choice.ego>0?'+':'')+choice.ego+'</span>';
-  if (choice.superego) pills += '<span class="effect-pill '+(choice.superego>0?'up-sup':'down-sup')+'">S-IO '+(choice.superego>0?'+':'')+choice.superego+'</span>';
-  if (choice.defense)  pills += '<span class="effect-pill def-pill">difesa</span>';
-  fxEl.innerHTML = pills;
+function choose(dir,card,el){
+  if(!G.alive)return;const choice=dir==='left'?card.l:card.r;
+  let des=choice.es||0,dio=choice.io||0,dsup=choice.superio||0;
+  if(G.defenses.includes('rimozione')&&dio<=-2)dio+=1;
+  if(G.defenses.includes('umorismo')&&dio<0)dio+=1;
+  if(G.defenses.includes('sublimazione')&&des>=2)dio+=1;
+  if(G.defenses.includes('formazione_reattiva')&&des>0)dsup+=Math.min(des,1);
+  if(G.defenses.includes('spostamento')&&dsup<0)dsup+=1;
+  if(G.defenses.includes('razionalizzazione')&&des>0&&dsup<0)dsup=0;
+  if(G.defenses.includes('proiezione')&&G.es>=8&&dsup<0)dsup=0;
+  if(G.defenses.includes('scissione')){if(des>0)des+=1;if(des<0)des-=1;if(dio>0)dio+=1;if(dio<0)dio-=1;if(dsup>0)dsup+=1;if(dsup<0)dsup-=1}
+  if(G.psychos.includes('ansia_generalizzata'))dio-=1;
+  if(G.psychos.includes('depressione')){if(dio>0)dio=Math.ceil(dio/2);if(des>0)des=Math.ceil(des/2)}
+  if(G.psychos.includes('dipendenza')&&des>0)des*=2;
+  G.es=clamp(G.es+des);G.io=clamp(G.io+dio);G.superio=clamp(G.superio+dsup);
+  if(G.defenses.includes('intellettualizzazione')&&G.superio<3)G.superio=3;
+  if(G.defenses.includes('identificazione')&&G.es<3)G.es=3;
+  if(G.defenses.includes('regressione')&&G.io<4)G.io=clamp(G.io+1);
+  G.cards++;let ageGain=G.phase<=1?Math.floor(Math.random()*2)+2:Math.floor(Math.random()*3)+2;
+  G.age+=ageGain;G.phase=getPhase(G.age);
+  if(G.psychos.includes('narcisismo')&&G.cards%3===0)G.io=clamp(G.io-1);
+  if(G.psychos.includes('nevrosi_ossessiva')&&G.cards%4===0)G.es=clamp(G.es-1);
+  if(G.psychos.includes('isteria')&&G.cards%4===0)G.io=clamp(G.io-1);
+  if(G.psychos.includes('ansia_generalizzata')&&G.cards%3===0)G.io=clamp(G.io-1);
+  if(G.psychos.includes('depressione')&&G.cards%4===0){G.io=clamp(G.io-1);G.es=clamp(G.es-1)}
+  if(G.psychos.includes('dipendenza')&&G.cards%3===0)G.es=clamp(G.es+1);
+  if(G.psychos.includes('somatizzazione')&&G.cards%5===0){G.es=clamp(G.es-1);G.io=clamp(G.io-1);G.superio=clamp(G.superio-1)}
+  if(G.psychos.includes('dissociazione')&&G.cards%5===0)G.io=clamp(G.io-1);
+  if(G.psychos.includes('disturbo_borderline')&&G.cards%2===0){G.es=clamp(G.es+(Math.random()>.5?1:-1));G.io=clamp(G.io+(Math.random()>.5?1:-1));G.superio=clamp(G.superio+(Math.random()>.5?1:-1))}
+  checkDefenses();checkPsychopathologies();
+  el.style.transition='transform .3s ease, opacity .3s ease';
+  el.style.transform=dir==='left'?'translateX(-120%) rotate(-12deg)':'translateX(120%) rotate(12deg)';el.style.opacity='0';
+  updateStats();renderBadges();
+  setTimeout(()=>{if(!G.alive)return;if(checkDeath())return;if(G.age>=100){endGame('natural');return}drawCard()},350);
 }
-
-// ═══════════════════════════════════════════════════════
-// CHOICE
-// ═══════════════════════════════════════════════════════
-function makeChoice(side) {
-  if (state.gameOver || !currentCard) return;
-  const choice = side === 'left' ? currentCard.leftChoice : currentCard.rightChoice;
-  const card = document.getElementById('card');
-  card.style.transition = 'transform 0.38s ease-in, opacity 0.38s';
-  card.style.transform = side === 'left' ? 'rotate(-28deg) translateX(-500px)' : 'rotate(28deg) translateX(500px)';
-  card.style.opacity = '0';
-  setTimeout(() => {
-    applyChoice(choice);
-    applyPathologyEffects();
-    checkPathologies();
-    checkDeath(choice);
-    if (!state.gameOver) {
-      state.phaseCardsPlayed++;
-      state.totalCardsPlayed++;
-      drawCard();
-    }
-  }, 400);
+function checkDefenses(){
+  const conds={rimozione:()=>G.superio>=7&&G.es>=5&&!G.defenses.includes('rimozione'),proiezione:()=>G.es>=7&&G.io<=5&&!G.defenses.includes('proiezione'),sublimazione:()=>G.es>=6&&G.io>=6&&!G.defenses.includes('sublimazione'),umorismo:()=>G.io>=6&&G.cards>=8&&!G.defenses.includes('umorismo'),intellettualizzazione:()=>G.superio>=7&&G.io>=5&&!G.defenses.includes('intellettualizzazione'),negazione:()=>G.io<=4&&G.es>=5&&!G.defenses.includes('negazione'),regressione:()=>G.io<=4&&G.phase>=1&&!G.defenses.includes('regressione'),formazione_reattiva:()=>G.es>=7&&G.superio>=6&&!G.defenses.includes('formazione_reattiva'),spostamento:()=>G.es>=6&&G.superio<=4&&!G.defenses.includes('spostamento'),razionalizzazione:()=>G.superio>=6&&G.io>=5&&G.es<=5&&!G.defenses.includes('razionalizzazione'),identificazione:()=>G.es>=8&&G.io<=4&&!G.defenses.includes('identificazione'),scissione:()=>G.io<=3&&G.psychos.length>=1&&!G.defenses.includes('scissione')};
+  for(const[k,fn]of Object.entries(conds)){if(fn()&&Math.random()<0.35){G.defenses.push(k);DEFENSES[k].fx(G);showNotif('Meccanismo acquisito: '+DEFENSES[k].name,'defense-notif',3000);setTimeout(()=>showModal('defense',k),500);break}}
 }
-
-function applyChoice(choice) {
-  let idDelta = choice.id;
-  if (state.idModifier && choice.id > 0) idDelta = Math.round(choice.id * (1 + state.idModifier));
-  if (state.spostamento && idDelta > 8) idDelta = Math.round(idDelta * 0.7);
-
-  let egoDelta = choice.ego;
-  if (state.regressionePenalty && choice.id > 5) egoDelta -= 2;
-
-  state.id = clamp(state.id + idDelta, 0, 100);
-  state.ego = clamp(state.ego + egoDelta, 0, 100);
-
-  let supDelta = choice.superego;
-  if (state.narcisismoActive && choice.superego > 0 && choice.tags && choice.tags.includes && choice.tags.includes('help')) supDelta = 0;
-  state.superego = clamp(state.superego + supDelta, 0, 100);
-
-  if (state.sublimazione && currentCard && currentCard.tags && currentCard.tags.includes('art')) {
-    state.ego = clamp(state.ego + 3, 0, 100);
-  }
-
-  if (choice.defense && !state.defenses.includes(choice.defense)) {
-    acquireDefense(choice.defense, choice.log);
-  } else {
-    addLog(choice.log);
-    updateUI();
-  }
+function checkPsychopathologies(){
+  for(const[k,p]of Object.entries(PSYCHOS)){if(!G.psychos.includes(k)&&p.cond(G)){if(G.defenses.includes('negazione')&&!G.deathSaves['negazione_psycho_'+k]){G.deathSaves['negazione_psycho_'+k]=true;continue}G.psychos.push(k);showNotif('Psicopatologia: '+p.name,'psycho-notif',3000);setTimeout(()=>showModal('psycho',k),500);break}}
 }
-
-function applyPathologyEffects() {
-  for (const key of state.pathologies) {
-    const p = PATHOLOGIES[key];
-    if (p && p.ongoingEffect) p.ongoingEffect(state);
-  }
-  state.id = clamp(state.id, 0, 100);
-  state.ego = clamp(state.ego, 0, 100);
-  state.superego = clamp(state.superego, 0, 100);
-}
-
-function acquireDefense(defId, log) {
-  if (!DEFENSES[defId]) return;
-  const def = DEFENSES[defId];
-  state.defenses.push(defId);
-  def.effect(state);
-  addLog(log || '');
-  updateUI();
-  showPopup('defense', defId);
-}
-
-// ═══════════════════════════════════════════════════════
-// PATHOLOGIES + DEATH
-// ═══════════════════════════════════════════════════════
-function checkPathologies() {
-  for (const [key, patho] of Object.entries(PATHOLOGIES)) {
-    if (patho.condition(state) && !state.pathologies.includes(key)) {
-      if (state.projezione && !state.proiezione_used) {
-        state.proiezione_used = true;
-        showNotification('Proiezione ha bloccato: ' + patho.name);
-        continue;
-      }
-      state.pathologies.push(key);
-      addLog('Psicopatologia: ' + patho.name);
-      updatePathologiesUI();
-      showPopup('patho', key);
-      return;
-    }
-  }
-}
-
-function checkDeath(choice) {
-  if (state.ego <= 3) {
-    if (state.negazione && !state.negazione_used) {
-      state.negazione_used = true;
-      state.ego = 12;
-      showNotification("La Negazione ti ha salvato dal collasso dell'IO.");
-      return;
-    }
-    triggerDeath('collasso_ego'); return;
-  }
-  if (state.pathologies.length >= 4) {
-    if (state.umorismo && !state.umorismo_used) {
-      state.umorismo_used = true;
-      showNotification("L'Umorismo ha allontanato la catastrofe psichica.");
-      return;
-    }
-    triggerDeath('psicopatologia'); return;
-  }
-  if (choice.mortal && state.pathologies.length >= 2) triggerDeath('scelta_fatale');
-}
-
-function triggerDeath(cause) {
-  state.gameOver = true;
-  const titles = { collasso_ego:'Dissoluzione', psicopatologia:'La Psiche si Spezza', scelta_fatale:'Una Scelta di Troppo', naturale:'La Fine Naturale' };
-  const subs = {
-    collasso_ego: "L'IO, logorato dal conflitto tra le forze psichiche, non regge piu. La coscienza si dissolve.",
-    psicopatologia: "Le psicopatologie accumulate hanno consumato ogni riserva psichica. La mente non trova piu un porto sicuro.",
-    scelta_fatale: "Una scelta pericolosa in una psiche gia fragile ha fatto cedere l'ultimo equilibrio.",
-    naturale: "Hai vissuto un'intera vita. Come ogni storia umana, anche questa trova la sua conclusione."
-  };
-  document.getElementById('overlay-title').textContent = titles[cause] || 'Fine';
-  document.getElementById('overlay-sub').textContent = subs[cause] || '';
-  const pathoList = state.pathologies.map(p => PATHOLOGIES[p]?.name || p).join(', ') || 'Nessuna';
-  const defList = state.defenses.map(d => DEFENSES[d]?.name || d).join(', ') || 'Nessuno';
-  document.getElementById('overlay-stats').innerHTML =
-    'Eta raggiunta: ' + state.age + ' anni<br>ES: ' + state.id + ' — IO: ' + state.ego + ' — SUPER-IO: ' + state.superego +
-    '<br>Psicopatologie: ' + pathoList + '<br>Meccanismi: ' + defList;
-  document.getElementById('overlay').classList.add('active');
-}
-
-// ═══════════════════════════════════════════════════════
-// POPUP
-// ═══════════════════════════════════════════════════════
-let popupQueue = [];
-let popupOpen = false;
-
-function showPopup(type, key) {
-  popupQueue.push({ type, key });
-  if (!popupOpen) processPopupQueue();
-}
-
-function processPopupQueue() {
-  if (popupQueue.length === 0) { popupOpen = false; return; }
-  popupOpen = true;
-  const { type, key } = popupQueue.shift();
-  if (type === 'defense') {
-    const def = DEFENSES[key];
-    if (!def) { popupOpen = false; processPopupQueue(); return; }
-    document.getElementById('popup-icon').textContent = def.icon;
-    document.getElementById('popup-title').textContent = 'Meccanismo di difesa acquisito';
-    document.getElementById('popup-title').style.color = '#2a9e99';
-    document.getElementById('popup-desc').textContent = def.name + ' — ' + def.desc;
-    document.getElementById('popup-effect').textContent = def.effectDesc;
-  } else {
-    const patho = PATHOLOGIES[key];
-    if (!patho) { popupOpen = false; processPopupQueue(); return; }
-    document.getElementById('popup-icon').textContent = patho.icon;
-    document.getElementById('popup-title').textContent = 'Psicopatologia emergente';
-    document.getElementById('popup-title').style.color = '#c93030';
-    document.getElementById('popup-desc').textContent = patho.name + ' — ' + patho.desc;
-    document.getElementById('popup-effect').textContent = patho.effectDesc;
-  }
-  document.getElementById('popup-overlay').classList.add('active');
-}
-
-function closePopup() {
-  document.getElementById('popup-overlay').classList.remove('active');
-  setTimeout(() => { popupOpen = false; processPopupQueue(); }, 150);
-}
-
-// ═══════════════════════════════════════════════════════
-// UI
-// ═══════════════════════════════════════════════════════
-function updateUI() {
-  setBar('id', state.id);
-  setBar('ego', state.ego);
-  setBar('superego', state.superego);
-  document.getElementById('age-num').textContent = state.age;
-  ['dot-0','dot-1','dot-2','dot-3','dot-4'].forEach((id, i) => {
-    const dot = document.getElementById(id);
-    dot.className = 'phase-dot';
-    if (i < state.phase) dot.classList.add('done');
-    if (i === state.phase) dot.classList.add('active');
-  });
-  document.getElementById('phase-label').textContent = PHASES[state.phase]?.name || '';
-  if (currentCard) {
-    const l = currentCard.leftChoice.text;
-    const r = currentCard.rightChoice.text;
-    document.getElementById('btn-left').textContent  = l.length > 24 ? l.slice(0,22)+'…' : l;
-    document.getElementById('btn-right').textContent = r.length > 24 ? r.slice(0,22)+'…' : r;
-  }
-  updatePathologiesUI();
-  updateDefensesUI();
-}
-
-function setBar(id, val) {
-  const fill = document.getElementById('bar-'+id);
-  const valEl = document.getElementById('val-'+id);
-  fill.style.width = val + '%';
-  valEl.textContent = val;
-  fill.classList.remove('danger-low','danger-high');
-  if (val <= 10) fill.classList.add('danger-high');
-  else if (val <= 20) fill.classList.add('danger-low');
-}
-
-function updatePathologiesUI() {
-  document.getElementById('pathologies-strip').innerHTML = state.pathologies.map(p => {
-    const patho = PATHOLOGIES[p];
-    return patho ? '<span class="patho-tag" onclick="showInfoPopup(\'patho\',\''+p+'\')">' + patho.icon + ' ' + patho.name + '</span>' : '';
-  }).join('');
-}
-
-function updateDefensesUI() {
-  document.getElementById('defenses-strip').innerHTML = state.defenses.map(d => {
-    const def = DEFENSES[d];
-    return def ? '<span class="defense-tag" onclick="showInfoPopup(\'defense\',\''+d+'\')">' + def.icon + ' ' + def.name + '</span>' : '';
-  }).join('');
-}
-
-function showInfoPopup(type, key) {
-  popupQueue.unshift({ type, key });
-  if (!popupOpen) processPopupQueue();
-}
-
-function addLog(text) {
-  if (!text) return;
-  const log = document.getElementById('event-log');
-  const entry = document.createElement('div');
-  entry.className = 'log-entry fresh';
-  entry.textContent = text;
-  log.insertBefore(entry, log.firstChild);
-  setTimeout(() => entry.classList.remove('fresh'), 2500);
-  while (log.children.length > 8) log.removeChild(log.lastChild);
-}
-
-function showNotification(text) {
-  const n = document.getElementById('notification');
-  n.textContent = text;
-  n.classList.add('show');
-  setTimeout(() => n.classList.remove('show'), 3200);
-}
-
-// ═══════════════════════════════════════════════════════
-// DRAG
-// ═══════════════════════════════════════════════════════
-function setupDrag() {
-  const card = document.getElementById('card');
-  let startX = 0;
-  let shown = '';
-
-  const onStart = (x) => {
-    if (state.gameOver) return;
-    isDragging = true;
-    startX = x;
-  };
-
-  const onMove = (x) => {
-    if (!isDragging) return;
-    const dx = x - startX;
-    const tilt = clamp(dx / 10, -20, 20);
-    const tx = clamp(dx * 0.4, -80, 80);
-    card.style.transition = 'none';
-    card.style.transform = 'rotate(' + tilt + 'deg) translateX(' + tx + 'px)';
-
-    if (dx < -40 && shown !== 'left') {
-      document.getElementById('preview-left').classList.add('show-left');
-      document.getElementById('preview-right').classList.remove('show-right');
-      shown = 'left';
-    } else if (dx > 40 && shown !== 'right') {
-      document.getElementById('preview-right').classList.add('show-right');
-      document.getElementById('preview-left').classList.remove('show-left');
-      shown = 'right';
-    } else if (Math.abs(dx) < 40 && shown) {
-      hideChoicePreviews();
-      shown = '';
-    }
-  };
-
-  const onEnd = (x) => {
-    if (!isDragging) return;
-    isDragging = false;
-    const dx = x - startX;
-    if (dx < -90) { makeChoice('left'); }
-    else if (dx > 90) { makeChoice('right'); }
-    else {
-      card.style.transition = 'transform 0.3s ease';
-      card.style.transform = '';
-      hideChoicePreviews();
-    }
-    shown = '';
-  };
-
-  card.addEventListener('mousedown', e => onStart(e.clientX));
-  window.addEventListener('mousemove', e => { if (isDragging) onMove(e.clientX); });
-  window.addEventListener('mouseup', e => onEnd(e.clientX));
-  card.addEventListener('touchstart', e => onStart(e.touches[0].clientX), { passive:true });
-  window.addEventListener('touchmove', e => { if (isDragging) onMove(e.touches[0].clientX); }, { passive:true });
-  window.addEventListener('touchend', e => onEnd(e.changedTouches[0].clientX));
-}
-
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function checkDeath(){
+  if(G.io<=2){
+    if(G.defenses.includes('umorismo')&&!G.deathSaves.umorismo){G.deathSaves.umorismo=true;G.io=4;showNotif("L'Umorismo ti salva dal collasso!",'save-notif',3000);updateStats();return false}
+    if(G.defenses.includes('negazione')&&!G.deathSaves.negazione){G.deathSaves.negazione=true;G.io=4;showNotif('La Negazione ti salva dal collasso!','save-notif',3000);updateStats();return false}
+    if(G.defenses.includes('proiezione')&&!G.deathSaves.proiezione){G.deathSaves.proiezione=true;G.io=4;showNotif('La Proiezione ti salva dal collasso!','save-notif',3000);updateStats();return false}
+    endGame('collapse');return true}
+  if(G.psychos.length>=4&&G.io<=4){endGame('psycho_overload');return true}return false}
+function endGame(reason){
+  G.alive=false;const screen=document.getElementById('gameover-screen'),title=document.getElementById('go-title'),cause=document.getElementById('go-cause'),summary=document.getElementById('go-summary');
+  screen.classList.remove('natural');
+  if(reason==='natural'){screen.classList.add('natural');title.textContent='UNA VITA VISSUTA';cause.textContent=`Hai raggiunto i ${G.age} anni. La tua vita è giunta al termine naturale.`}
+  else if(reason==='collapse'){title.textContent='COLLASSO PSICHICO';cause.textContent=`A ${G.age} anni, l'Io è crollato. Le forze psichiche hanno travolto la tua capacità di mediazione con la realtà.`}
+  else{title.textContent='DISGREGAZIONE';cause.textContent=`A ${G.age} anni, il peso di ${G.psychos.length} psicopatologie ha frantumato la tua psiche.`}
+  let dt=G.defenses.length>0?G.defenses.map(d=>DEFENSES[d].name).join(', '):'Nessuno';
+  let pt=G.psychos.length>0?G.psychos.map(p=>PSYCHOS[p].name).join(', '):'Nessuna';
+  summary.innerHTML=`<b>ES:</b> ${G.es} | <b>IO:</b> ${G.io} | <b>SUPER-IO:</b> ${G.superio}<br><b>Meccanismi:</b> ${dt}<br><b>Psicopatologie:</b> ${pt}<br><b>Carte giocate:</b> ${G.cards}`;
+  screen.classList.add('show')}
+function startGame(){document.getElementById('title-screen').style.display='none';G={es:5,io:5,superio:5,age:5,phase:0,cards:0,defenses:[],psychos:[],alive:true,deathSaves:{}};buildDeck();updateStats();renderBadges();drawCard()}
+function restartGame(){document.getElementById('gameover-screen').classList.remove('show');G={es:5,io:5,superio:5,age:5,phase:0,cards:0,defenses:[],psychos:[],alive:true,deathSaves:{}};buildDeck();updateStats();renderBadges();drawCard()}
 </script>
 </body>
 </html>
